@@ -22,7 +22,7 @@ worry about it. I'll do that when I pull it in.
 ## Ports and implementations
 
 Another way to get involved is by sharing your own implementation of Lox. Ports
-to other langauges are particularly useful since not every reader likes Java and
+to other languages are particularly useful since not every reader likes Java and
 C. Feel free to add your Lox port or implementation to the wiki:
 
 * [Lox implementations][]
@@ -42,27 +42,21 @@ though I can't help you out much.
 
 Most of the work is orchestrated by make. The build scripts, test runner, and
 other utilities are all written in Python 3. The makefile assumes `python3` is
-on your PATH.
-
-You'll need to install a few Python packages:
-
-```sh
-$ pip3 install markdown jinja2 pygments
-```
-
-The makefile also assumes Ruby (in particular `gem`) is on your PATH. You'll
-need to install this gem:
+on your PATH, but it only uses that to set up a Python venv environement which
+it then uses for everything else:
 
 ```sh
-$ gem install sass
+$ make setup
 ```
 
-In order to get syntax highlighting for Lox itself working, you need to plug in
-its custom Pygments lexer:
+This creates the Python environment at `util/env` and installs the required
+packages into it. All other Python scripts in the repo invoke Python from this
+environment.
 
-```sh
-$ (cd util/pygments && python3 setup.py develop)
-```
+You also need [Sass][] installed and on your PATH. Follow the instructions there
+to install it for your OS.
+
+[sass]: https://sass-lang.com/
 
 In order to compile the two interpreters, you need some C compiler on your path
 as well as `javac`.
@@ -80,8 +74,8 @@ compiling the two interpreters clox and jlox. You can run either interpreter
 right from the root of the repo:
 
 ```sh
-$ clox
-$ jlox
+$ ./clox
+$ ./jlox
 ```
 
 ### Hacking on the book

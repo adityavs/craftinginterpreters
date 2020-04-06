@@ -10,9 +10,10 @@
 <link rel="stylesheet" type="text/css" href="style.css" />
 
 <!-- Oh, God, Source Code Pro is so beautiful it makes me want to cry. -->
-<link href='http://fonts.googleapis.com/css?family=Source+Code+Pro:400|Source+Sans+Pro:300,400,600' rel='stylesheet' type='text/css'>
+<link href='https://fonts.googleapis.com/css?family=Source+Code+Pro:400|Source+Sans+Pro:300,400,600' rel='stylesheet' type='text/css'>
+
 <link rel="icon" type="image/png" href="image/favicon.png" />
-<script src="jquery-1.10.1.min.js"></script>
+<script src="jquery-3.4.1.min.js"></script>
 <script src="script.js"></script>
 
 <!-- Google analytics -->
@@ -94,9 +95,9 @@
   <h1>Resolving and Binding</h1>
 
 <div class="sign-up closable">
-    <h1>This book is a work in progress!</h1>
+  <h1>This book is a work in progress!</h1>
     <span class="dismiss">&times;</span>
-    <p>If you see a mistake, find something unclear, or have a suggestion, please <a href="https://github.com/munificent/craftinginterpreters/issues" target="_blank">let me know</a>. To learn when new chapters are up, join the mailing list:</p>
+    <p>If you see a mistake, find something unclear, or have a suggestion, please <a href="https://github.com/munificent/craftinginterpreters/issues" target="_blank">let me know</a>. To follow its progress, please join the mailing list:</p>
 
   <!-- Begin MailChimp Signup Form -->
   <div id="mc_embed_signup">
@@ -116,7 +117,7 @@
 degrees and in the most natural way but, when you are right in the midst of
 it, you are suddenly astonished and ask yourself how in the world it all came
 about.</p>
-<p><cite>Thor Heyerdahl</cite></p>
+<p><cite>Thor Heyerdahl, <em>Kon-Tiki</em></cite></p>
 </blockquote>
 <p>Oh, no! Our language implementation is taking on water! Way back when we <a href="statements-and-state.html">added
 variables and blocks</a>, we had scoping nice and tight. But when we
@@ -353,7 +354,7 @@ a variable it would return a <em>new</em> environment that contained all of the
 previously-declared variables along with the one new name. Declaring a variable
 would do the implicit &ldquo;split&rdquo; where you have an environment before the variable
 is declared and one after:</p>
-<p><img src="image/resolving-and-binding/split.png" alt="Seperate environments before and after the variable is declared." /></p>
+<p><img src="image/resolving-and-binding/split.png" alt="Separate environments before and after the variable is declared." /></p>
 <p>A closure retains a reference to the Environment instance in play when the
 function was declared. Since any later declarations in that block would produce
 new Environment objects, the closure wouldn&rsquo;t see the new variables and our bug
@@ -432,8 +433,8 @@ execution:</p>
 </li>
 </ul>
 <aside name="fix">
-<p>Variable resolution touches each node once, so its performance is <code>O(n)</code> where
-<code>n</code> is the number of syntax tree nodes. More sophisticated analyses may have
+<p>Variable resolution touches each node once, so its performance is <em>O(n)</em> where
+<em>n</em> is the number of syntax tree nodes. More sophisticated analyses may have
 greater complexity, but most are carefully designed to be linear or not far from
 it. It&rsquo;s an embarrassing faux pas if your compiler gets exponentially slower as
 the user&rsquo;s program grows.</p>
@@ -535,9 +536,9 @@ add after <em>resolve</em>()</div>
 
 <div class="source-file-narrow"><em>lox/Resolver.java</em>, add after <em>resolve</em>()</div>
 
-<p>Lexical scopes nest and in both the interpreter and the resolver. They behave
-like a stack. The interpreter implements that stack using a linked list<span class="em">&mdash;</span>the
-chain of Environment objects. In the resolver, we use an actual Java Stack:</p>
+<p>Lexical scopes nest in both the interpreter and the resolver. They behave like a
+stack. The interpreter implements that stack using a linked list<span class="em">&mdash;</span>the chain of
+Environment objects. In the resolver, we use an actual Java Stack:</p>
 <div class="codehilite"><pre class="insert-before"><span></span>  <span class="kd">private</span> <span class="kd">final</span> <span class="n">Interpreter</span> <span class="n">interpreter</span><span class="o">;</span>                           
 </pre><div class="source-file"><em>lox/Resolver.java</em><br>
 in class <em>Resolver</em></div>
@@ -587,13 +588,13 @@ add after <em>visitBlockStmt</em>()</div>
 <p>Before we get to the interesting code, we need another overload of <code>resolve()</code>
 to resolve an expression instead of a statement:</p>
 <div class="codehilite"><div class="source-file"><em>lox/Resolver.java</em><br>
-in <em>resolve</em>()</div>
+add after <em>resolve</em>(Stmt stmt)</div>
 <pre><span></span>  <span class="kd">private</span> <span class="kt">void</span> <span class="nf">resolve</span><span class="o">(</span><span class="n">Expr</span> <span class="n">expr</span><span class="o">)</span> <span class="o">{</span>
     <span class="n">expr</span><span class="o">.</span><span class="na">accept</span><span class="o">(</span><span class="k">this</span><span class="o">);</span>             
   <span class="o">}</span>                                
 </pre></div>
 
-<div class="source-file-narrow"><em>lox/Resolver.java</em>, in <em>resolve</em>()</div>
+<div class="source-file-narrow"><em>lox/Resolver.java</em>, add after <em>resolve</em>(Stmt stmt)</div>
 
 <p>Now to the semantics. We split binding into two separate steps<span class="em">&mdash;</span>declaring and
 defining<span class="em">&mdash;</span>in order to handle this funny edge case:</p>
@@ -985,10 +986,10 @@ add after <em>execute</em>()</div>
 variable or assignment expression is later executed, but where? One obvious
 place is right in the syntax tree node itself. That&rsquo;s a fine approach, and
 that&rsquo;s where many compilers store the results of analyses like this.</p>
-<p>We could do that, but it would require mucking around with our syntax tree
-generator. Instead, we&rsquo;ll take another common approach and store it off to the
-<span name="side">side</span> in a map that associates each syntax tree node
-with its resolved data:</p>
+<p>We could do that, but it would require <span name="side">mucking</span> around
+with our syntax tree generator. Instead, we&rsquo;ll take another common approach and
+store it off to the side in a map that associates each syntax tree node with its
+resolved data:</p>
 <aside name="side">
 <p>I <em>think</em> I&rsquo;ve heard this map called a &ldquo;side table&rdquo; since it&rsquo;s a tabular data
 structure that stores data separately from the objects it relates to. But
@@ -1090,7 +1091,7 @@ add after <em>define</em>()</div>
 <pre><span></span>  <span class="n">Environment</span> <span class="nf">ancestor</span><span class="o">(</span><span class="kt">int</span> <span class="n">distance</span><span class="o">)</span> <span class="o">{</span>                 
     <span class="n">Environment</span> <span class="n">environment</span> <span class="o">=</span> <span class="k">this</span><span class="o">;</span>                    
     <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">distance</span><span class="o">;</span> <span class="n">i</span><span class="o">++)</span> <span class="o">{</span>               
-      <span class="n">environment</span> <span class="o">=</span> <span class="n">environment</span><span class="o">.</span><span class="na">enclosing</span><span class="o">;</span> <span name="coupled"></span>
+      <span class="n">environment</span> <span class="o">=</span> <span class="n">environment</span><span class="o">.</span><span class="na">enclosing</span><span class="o">;</span><span name="coupled"> </span>
     <span class="o">}</span>
 
     <span class="k">return</span> <span class="n">environment</span><span class="o">;</span>                                
@@ -1221,7 +1222,7 @@ function declaration:</p>
 <div class="codehilite"><pre class="insert-before"><span></span>  <span class="kd">private</span> <span class="kd">final</span> <span class="n">Stack</span><span class="o">&lt;</span><span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">Boolean</span><span class="o">&gt;&gt;</span> <span class="n">scopes</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Stack</span><span class="o">&lt;&gt;();</span>
 </pre><div class="source-file"><em>lox/Resolver.java</em><br>
 in class <em>Resolver</em></div>
-<pre class="insert"><span></span><span class="kd">private</span> <span class="n">FunctionType</span> <span class="n">currentFunction</span> <span class="o">=</span> <span class="n">FunctionType</span><span class="o">.</span><span class="na">NONE</span><span class="o">;</span>          
+<pre class="insert"><span></span>  <span class="kd">private</span> <span class="n">FunctionType</span> <span class="n">currentFunction</span> <span class="o">=</span> <span class="n">FunctionType</span><span class="o">.</span><span class="na">NONE</span><span class="o">;</span>        
 </pre><pre class="insert-after"><br><span></span>  <span class="n">Resolver</span><span class="o">(</span><span class="n">Interpreter</span> <span class="n">interpreter</span><span class="o">)</span> <span class="o">{</span>                              
 </pre></div>
 
@@ -1372,7 +1373,7 @@ use that to quickly access a variable by its index instead of using a map.</p>
 <a href="classes.html" class="next">
   Next Chapter: &ldquo;Classes&rdquo; &rarr;
 </a>
-Hand-crafted by Robert Nystrom&ensp;&mdash;&ensp;<a href="https://github.com/munificent/craftinginterpreters/blob/master/LICENSE" target="_blank">&copy; 2015&hairsp;&ndash;&hairsp;2018</a>
+Hand-crafted by Robert Nystrom&ensp;&mdash;&ensp;<a href="https://github.com/munificent/craftinginterpreters/blob/master/LICENSE" target="_blank">&copy; 2015&hairsp;&ndash;&hairsp;2020</a>
 </footer>
 </article>
 

@@ -6,7 +6,7 @@
 > created on stage are often the result of a secret so absurd that the magician
 > would be embarrassed to admit that that was how it was done.
 >
-> <cite>Christopher Priest</cite>
+> <cite>Christopher Priest, <em>The Prestige</em></cite>
 
 We've spent a lot of time talking about how to represent a program as a sequence
 of bytecode instructions, but it feels like learning biology using only dead
@@ -323,17 +323,17 @@ argument. That side effect means we can see the exact order of operations.
 Don't worry about the VM for a minute. Think about just the semantics of Lox
 itself. The operands to an arithmetic operator obviously need to be evaluated
 before we can perform the operation itself. (It's pretty hard to add `a + b` if
-you don't know what `a` and `b` are.) I haven't specified this yet, but
-I'll go ahead and <span name="undefined">declare</span> that in Lox, the
-left-hand side of a binary operator is evaluated before the right.
+you don't know what `a` and `b` are.) Also, when we implemented expressions in
+jlox, we <span name="undefined">decided</span> that the left operand must be
+evaluated before the right.
 
 <aside name="undefined">
 
-We could leave this unspecified and say each implementation can decide which
-order to evaluate operands. That leaves the door open for optimizing compilers
-to reorder arithmetic expressions for efficiency, even in cases where the
-operands have visible side effects. C and Scheme leave it unspecified. Java
-specifies left-to-right evaluation like we do for Lox.
+We could have left evaluation order unspecified and let each implementation
+decide. That leaves the door open for optimizing compilers to reorder arithmetic
+expressions for efficiency, even in cases where the operands have visible side
+effects. C and Scheme leave evaluation order unspecified. Java specifies
+left-to-right evaluation like we do for Lox.
 
 I think nailing down stuff like this is generally better for users. When
 expressions are not evaluated in the order users intuit -- possibly in different
@@ -590,7 +590,7 @@ contents of the stack before we interpret each instruction:
 We loop, printing each value in the array, starting at the first (bottom of the
 stack) and ending when we reach the top. This lets us observe the effect of each
 instruction on the stack. The output is pretty verbose, but it's useful when
-we're tracking down a bug deep in the sewers of the interpreter.
+we're surgically extracting a nasty bug from the bowels of the interpreter.
 
 Stack in hand, let's revisit our two instructions. First up:
 
@@ -783,7 +783,7 @@ need:
 The addition goes first. The instruction for the left constant, 1.2, is already
 there, so we add another for 3.4. Then we add those two using `OP_ADD`, leaving
 it on the stack. That covers the left side of the division. Next we push the
-5.6, and divide it by the result of the addition. Finally, we negate the result
+5.6, and divide the result of the addition by it. Finally, we negate the result
 of that.
 
 Note how the output of the `OP_ADD` implicitly flows into being an operand of
@@ -922,9 +922,9 @@ sophistication, but that should get your attention.
 
 <aside name="lua">
 
-Roberto Ierusalimschy and a couple of other folks wrote a *fantastic* paper on
-this, one of my all time favorite computer science papers, "[The Implementation
-of Lua 5.0][lua]" (PDF).
+The Lua dev team -- Roberto Ierusalimschy, Waldemar Celes, and Luiz Henrique de
+Figueiredo -- wrote a *fantastic* paper on this, one of my all time favorite
+computer science papers, "[The Implementation of Lua 5.0][lua]" (PDF).
 
 [lua]: https://www.lua.org/doc/jucs05.pdf
 

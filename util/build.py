@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!./util/env/bin/python3
 # -*- coding: utf-8 -*-
 
 import codecs
@@ -18,20 +18,14 @@ import markdown
 
 import book
 import code_snippets
-
-GRAY = '\033[1;30m'
-GREEN = '\033[32m'
-RED = '\033[31m'
-DEFAULT = '\033[0m'
-PINK = '\033[91m'
-YELLOW = '\033[33m'
+import term
 
 CODE_OPTIONS_PATTERN = re.compile(r'([-a-z0-9]+) \(([^)]+)\)')
 BEFORE_PATTERN = re.compile(r'(\d+) before')
 AFTER_PATTERN = re.compile(r'(\d+) after')
 
-ASIDE_COMMENT_PATTERN = re.compile(r'<span class="c1">// \[([-a-z0-9]+)\]</span>')
-ASIDE_WITH_COMMENT_PATTERN = re.compile(r'<span class="c1">// (.+) \[([-a-z0-9]+)\]</span>')
+ASIDE_COMMENT_PATTERN = re.compile(r' ?<span class="c1">// \[([-a-z0-9]+)\] *</span>')
+ASIDE_WITH_COMMENT_PATTERN = re.compile(r' ?<span class="c1">// (.+) \[([-a-z0-9]+)\] *</span>')
 # The "(?!-)" is a hack. scanning.md has an inline code sample containing a
 # "--" operator. We don't want that to get matched, so fail the match if the
 # character after the "-- " is "-", which is the next character in the code
@@ -122,7 +116,7 @@ def format_code(language, length, lines):
 
   markup += '```'
 
-  html = markdown.markdown(markup, ['extra', 'codehilite'])
+  html = markdown.markdown(markup, extensions=['extra', 'codehilite'])
 
   if leading_newlines > 0:
     html = html.replace('<pre>', '<pre>' + ('<br>' * leading_newlines))
@@ -192,6 +186,14 @@ def insert_snippet(snippets, arg, contents, errors):
   location = []
   if show_location:
     location = snippet.describe_location()
+
+  # Make sure every snippet shows the reader where it goes.
+  if (show_location and len(location) <= 1
+      and before_lines == 0 and after_lines == 0):
+    print("No location or context for {}".format(name))
+    errors.append("No location or context for {}".format(name))
+    contents += "**ERROR: No location or context for {}**\n".format(name)
+    return contents
 
   # TODO: Show indentation in snippets somehow.
 
@@ -381,11 +383,13 @@ def format_file(path, skip_up_to_date, dependencies_mod):
   contents = contents.replace('<aside', '<aside markdown="1"')
   contents = contents.replace('<div class="challenges">', '<div class="challenges" markdown="1">')
   contents = contents.replace('<div class="design-note">', '<div class="design-note" markdown="1">')
-  body = markdown.markdown(contents, ['extra', 'codehilite', 'smarty'])
+  body = markdown.markdown(contents, extensions=['extra', 'codehilite', 'smarty'])
 
-  # Turn aside markers in code into spans.
+  # Turn aside markers in code into spans. In the empty span case, insert a
+  # zero-width space because Chrome seems to lose the span's position if it has
+  # no content.
   # <span class="c1">// [repl]</span>
-  body = ASIDE_COMMENT_PATTERN.sub(r'<span name="\1"></span>', body)
+  body = ASIDE_COMMENT_PATTERN.sub(r'<span name="\1"> </span>', body)
   body = ASIDE_WITH_COMMENT_PATTERN.sub(r'<span class="c1" name="\2">// \1</span>', body)
 
   up = 'Table of Contents'
@@ -432,24 +436,23 @@ def format_file(path, skip_up_to_date, dependencies_mod):
     num_chapters += 1
     if word_count < 50:
       empty_chapters += 1
-      print("    {}{}{}{}".format(GRAY, num, title, DEFAULT))
-    elif word_count < 2000:
+      print("    " + term.gray("{}{}".format(num, title)))
+    elif part != "Backmatter" and word_count < 2000:
       empty_chapters += 1
-      print("  {}-{} {}{} ({} words)".format(
-        YELLOW, DEFAULT, num, title, word_count))
+      print("  {} {}{} ({} words)".format(
+          term.yellow("-"), num, title, word_count))
     else:
       total_words += word_count
-      print("  {}✓{} {}{} ({} words)".format(
-        GREEN, DEFAULT, num, title, word_count))
+      print("  {} {}{} ({} words)".format(
+          term.green("✓"), num, title, word_count))
   elif title in ["Crafting Interpreters", "Table of Contents"]:
-    print("{}•{} {}{}".format(
-      GREEN, DEFAULT, num, title))
+    print("{} {}{}".format(term.green("•"), num, title))
   else:
     if word_count < 50:
-      print("  {}{}{}{}".format(GRAY, num, title, DEFAULT))
+      print("    " + term.gray("{}{}".format(num, title)))
     else:
-      print("{}✓{} {}{} ({} words)".format(
-        GREEN, DEFAULT, num, title, word_count))
+      print("{} {}{} ({} words)".format(
+          term.green("✓"), num, title, word_count))
 
 
 def latest_mod(glob_pattern):
@@ -510,7 +513,7 @@ def build_sass(skip_up_to_date):
         continue
 
     subprocess.call(['sass', source, dest])
-    print("{}•{} {}".format(GREEN, DEFAULT, source))
+    print("{} {}".format(term.green("•"), source))
 
 
 def run_server():
@@ -549,10 +552,10 @@ else:
   first_writing_day = datetime.date(2016, 9, 30)
   today = datetime.date.today()
   writing_days = (today - first_writing_day).days
-  estimated_writing_days = int(writing_days / (percent_finished / 100))
+  estimated_writing_days = int(writing_days * (1.0 - (percent_finished / 100)))
   estimated_end_date = today + datetime.timedelta(days=estimated_writing_days)
 
-  print("{}/~{} words, {}% done ({})".format(
+  print("{}/~{} words, {}% done, estimated to complete on {}".format(
       total_words,
       estimated_word_count,
       percent_finished,

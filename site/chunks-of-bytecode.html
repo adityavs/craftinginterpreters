@@ -10,9 +10,10 @@
 <link rel="stylesheet" type="text/css" href="style.css" />
 
 <!-- Oh, God, Source Code Pro is so beautiful it makes me want to cry. -->
-<link href='http://fonts.googleapis.com/css?family=Source+Code+Pro:400|Source+Sans+Pro:300,400,600' rel='stylesheet' type='text/css'>
+<link href='https://fonts.googleapis.com/css?family=Source+Code+Pro:400|Source+Sans+Pro:300,400,600' rel='stylesheet' type='text/css'>
+
 <link rel="icon" type="image/png" href="image/favicon.png" />
-<script src="jquery-1.10.1.min.js"></script>
+<script src="jquery-3.4.1.min.js"></script>
 <script src="script.js"></script>
 
 <!-- Google analytics -->
@@ -100,9 +101,9 @@
   <h1>Chunks of Bytecode</h1>
 
 <div class="sign-up closable">
-    <h1>This book is a work in progress!</h1>
+  <h1>This book is a work in progress!</h1>
     <span class="dismiss">&times;</span>
-    <p>If you see a mistake, find something unclear, or have a suggestion, please <a href="https://github.com/munificent/craftinginterpreters/issues" target="_blank">let me know</a>. To learn when new chapters are up, join the mailing list:</p>
+    <p>If you see a mistake, find something unclear, or have a suggestion, please <a href="https://github.com/munificent/craftinginterpreters/issues" target="_blank">let me know</a>. To follow its progress, please join the mailing list:</p>
 
   <!-- Begin MailChimp Signup Form -->
   <div id="mc_embed_signup">
@@ -143,7 +144,7 @@ languages. But for a general-purpose, imperative language<span class="em">&mdash
 language like Lox, it won&rsquo;t fly. Take this little script:</p>
 <div class="codehilite"><pre><span></span><span class="k">fun</span> <span class="n">fib</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="p">{</span>
   <span class="k">if</span> <span class="p">(</span><span class="n">n</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">)</span> <span class="k">return</span> <span class="n">n</span><span class="p">;</span>
-  <span class="k">return</span> <span class="n">fib</span><span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="n">fib</span><span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="mi">2</span><span class="p">);</span> <span name="fib"></span>
+  <span class="k">return</span> <span class="n">fib</span><span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="n">fib</span><span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="mi">2</span><span class="p">);</span><span name="fib"> </span>
 <span class="p">}</span>
 
 <span class="k">var</span> <span class="n">before</span> <span class="o">=</span> <span class="n">clock</span><span class="p">();</span>
@@ -237,8 +238,9 @@ representation.</p>
 indirection out of the way. Right down to the metal. Machine code. It even
 <em>sounds</em> fast. <em>&ldquo;Machine code.&rdquo;</em></p>
 <p>Compiling directly to the native instruction set the chip supports is what the
-fastest languages do, and has been since the early days when engineers actually
-<span name="hand">hand-wrote</span> programs in machine code.</p>
+fastest languages do. Targeting native code has been the most efficient option
+since way back in the early days when engineers actually <span
+name="hand">hand-wrote</span> programs in machine code.</p>
 <aside name="hand">
 <p>Yes, they actually wrote machine code by hand. On punched cards. Which,
 presumably, they punched <em>with their fists</em>.</p>
@@ -413,12 +415,12 @@ arrays provide:</p>
 <li>Constant-time indexed element lookup.</li>
 <li>Constant-time appending to the end of the array.</li>
 </ul>
-<p>Those features are exactly why we used it all the time in jlox under the guise
-of Java&rsquo;s ArrayList class. Now that we&rsquo;re in C, we get to roll our own. If
-you&rsquo;re rusty on dynamic arrays, the idea is pretty simple. In addition to the
-array itself, we keep two numbers<span class="em">&mdash;</span>the number of elements in the array we have
-allocated (&ldquo;capacity&rdquo;) and how many of those allocated entries are actually in
-use (&ldquo;count&rdquo;).</p>
+<p>Those features are exactly why we used dynamic arrays all the time in jlox under
+the guise of Java&rsquo;s ArrayList class. Now that we&rsquo;re in C, we get to roll our
+own. If you&rsquo;re rusty on dynamic arrays, the idea is pretty simple. In addition
+to the array itself, we keep two numbers: the number of elements in the array we
+have allocated (&ldquo;capacity&rdquo;) and how many of those allocated entries are actually
+in use (&ldquo;count&rdquo;).</p>
 <div class="codehilite"><pre class="insert-before"><span></span><span class="k">typedef</span> <span class="k">struct</span> <span class="p">{</span>
 </pre><div class="source-file"><em>chunk.h</em><br>
 in struct <em>Chunk</em></div>
@@ -449,13 +451,13 @@ before storing an element." class="wide" /></p>
 </ol>
 <aside name="amortized">
 <p>Copying the existing elements when you grow the array makes it seem like
-appending an element is <code>O(n)</code>, not <code>O(1)</code> like I said above. However, you only
+appending an element is <em>O(n)</em>, not <em>O(1)</em> like I said above. However, you only
 need to do this copy step on <em>some</em> of the appends. Most of the time, there is
 already extra capacity, so you don&rsquo;t need to copy.</p>
 <p>To understand how this works, we need <a href="https://en.wikipedia.org/wiki/Amortized_analysis"><strong>amortized
 analysis</strong></a>. That shows us
 that as long as we grow the array by a multiple of its current size, when we
-average out the cost of a <em>sequence</em> of appends, each append is <code>O(1)</code>.</p>
+average out the cost of a <em>sequence</em> of appends, each append is <em>O(1)</em>.</p>
 </aside>
 <p>We have our struct ready, so let&rsquo;s implement the functions to work with it. C
 doesn&rsquo;t have constructors, so we declare a function to initialize a new chunk:</p>
@@ -771,7 +773,7 @@ create new file</div>
 <span class="cp">#include</span> <span class="cpf">&quot;chunk.h&quot;                                    </span><span class="cp"></span>
 
 <span class="kt">void</span> <span class="nf">disassembleChunk</span><span class="p">(</span><span class="n">Chunk</span><span class="o">*</span> <span class="n">chunk</span><span class="p">,</span> <span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">name</span><span class="p">);</span>
-<span class="kt">int</span> <span class="nf">disassembleInstruction</span><span class="p">(</span><span class="n">Chunk</span><span class="o">*</span> <span class="n">chunk</span><span class="p">,</span> <span class="kt">int</span> <span class="n">i</span><span class="p">);</span>      
+<span class="kt">int</span> <span class="nf">disassembleInstruction</span><span class="p">(</span><span class="n">Chunk</span><span class="o">*</span> <span class="n">chunk</span><span class="p">,</span> <span class="kt">int</span> <span class="n">offset</span><span class="p">);</span> 
 
 <span class="cp">#endif                                                </span>
 </pre></div>
@@ -792,8 +794,8 @@ create new file</div>
 <span class="kt">void</span> <span class="nf">disassembleChunk</span><span class="p">(</span><span class="n">Chunk</span><span class="o">*</span> <span class="n">chunk</span><span class="p">,</span> <span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">name</span><span class="p">)</span> <span class="p">{</span>
   <span class="n">printf</span><span class="p">(</span><span class="s">&quot;== %s ==</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">name</span><span class="p">);</span>                          
 
-  <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">chunk</span><span class="o">-&gt;</span><span class="n">count</span><span class="p">;)</span> <span class="p">{</span>                 
-    <span class="n">i</span> <span class="o">=</span> <span class="n">disassembleInstruction</span><span class="p">(</span><span class="n">chunk</span><span class="p">,</span> <span class="n">i</span><span class="p">);</span>              
+  <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">offset</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">offset</span> <span class="o">&lt;</span> <span class="n">chunk</span><span class="o">-&gt;</span><span class="n">count</span><span class="p">;)</span> <span class="p">{</span>       
+    <span class="n">offset</span> <span class="o">=</span> <span class="n">disassembleInstruction</span><span class="p">(</span><span class="n">chunk</span><span class="p">,</span> <span class="n">offset</span><span class="p">);</span>    
   <span class="p">}</span>                                                    
 <span class="p">}</span>                                                      
 </pre></div>
@@ -803,11 +805,11 @@ create new file</div>
 <p>To disassemble a chunk, we print a little header (so we can tell <em>which</em> chunk
 we&rsquo;re looking at) and then crank through the bytecode, disassembling each
 instruction. The way we iterate through the code is a little odd. Instead of
-incrementing <code>i</code> in the loop, we let <code>disassembleInstruction()</code> do it for us.
-When we call that function, after disassembling the instruction at the given
+incrementing <code>offset</code> in the loop, we let <code>disassembleInstruction()</code> do it for
+us. When we call that function, after disassembling the instruction at the given
 offset, it returns the offset of the <em>next</em> instruction. This is because, as
 we&rsquo;ll see later, instructions can have different sizes.</p>
-<p>The core of the debug module is this function:</p>
+<p>The core of the &ldquo;debug&rdquo; module is this function:</p>
 <div class="codehilite"><div class="source-file"><em>debug.c</em><br>
 add after <em>disassembleChunk</em>()</div>
 <pre><span></span><span class="kt">int</span> <span class="nf">disassembleInstruction</span><span class="p">(</span><span class="n">Chunk</span><span class="o">*</span> <span class="n">chunk</span><span class="p">,</span> <span class="kt">int</span> <span class="n">offset</span><span class="p">)</span> <span class="p">{</span>
@@ -831,7 +833,7 @@ in the chunk this instruction is. This will be a helpful signpost when we start
 doing control flow and jumping around in the bytecode.</p>
 <p>Next, it reads a single byte from the bytecode at the given offset. That&rsquo;s our
 opcode. We <span name="switch">switch</span> on that. For each kind of
-instruction, we dispatch to a little utlity function for displaying it. On the
+instruction, we dispatch to a little utility function for displaying it. On the
 off chance that the given byte doesn&rsquo;t look like an instruction at all<span class="em">&mdash;</span>a bug
 in our compiler<span class="em">&mdash;</span>we print that too. For the one instruction we do have,
 <code>OP_RETURN</code>, the display function is:</p>
@@ -1032,16 +1034,7 @@ in struct <em>Chunk</em></div>
 
 <div class="source-file-narrow"><em>chunk.h</em></div>
 
-<p>And another include over in the &ldquo;chunk.c&rdquo; implementation file:</p>
-<div class="codehilite"><pre class="insert-before"><span></span><span class="cp">#include</span> <span class="cpf">&quot;memory.h&quot;           </span><span class="cp"></span>
-</pre><div class="source-file"><em>chunk.c</em></div>
-<pre class="insert"><span></span><span class="cp">#include</span> <span class="cpf">&quot;value.h&quot;            </span><span class="cp"></span>
-</pre><pre class="insert-after"><br><span></span><span class="kt">void</span> <span class="nf">initChunk</span><span class="p">(</span><span class="n">Chunk</span><span class="o">*</span> <span class="n">chunk</span><span class="p">)</span> <span class="p">{</span>
-</pre></div>
-
-<div class="source-file-narrow"><em>chunk.c</em></div>
-
-<p>Ah, C, and it&rsquo;s Stone Age modularity story. Where were we? Right. When we
+<p>Ah, C, and its Stone Age modularity story. Where were we? Right. When we
 initialize a new chunk, we initialize its constant list too:</p>
 <div class="codehilite"><pre class="insert-before"><span></span>  <span class="n">chunk</span><span class="o">-&gt;</span><span class="n">code</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>               
 </pre><div class="source-file"><em>chunk.c</em><br>
@@ -1187,11 +1180,11 @@ add after <em>disassembleChunk</em>()</div>
 
 <p>There&rsquo;s more going on here. As with <code>OP_RETURN</code>, we print out the name of the
 opcode. Then we pull out the constant index from the subsequent byte in the
-chunk. We print that index, but that isn&rsquo;t super useful to we human readers. So
+chunk. We print that index, but that isn&rsquo;t super useful to us human readers. So
 we also look up the actual constant value<span class="em">&mdash;</span>since constants <em>are</em> known at
 compile-time after all<span class="em">&mdash;</span>and display the value itself too.</p>
 <p>This requires some way to print a Lox Value. That function will live in the
-value module, so we include that:</p>
+&ldquo;value&rdquo; module, so we include that:</p>
 <div class="codehilite"><pre class="insert-before"><span></span><span class="cp">#include</span> <span class="cpf">&quot;debug.h&quot;                                     </span><span class="cp"></span>
 </pre><div class="source-file"><em>debug.c</em></div>
 <pre class="insert"><span></span><span class="cp">#include</span> <span class="cpf">&quot;value.h&quot;                                     </span><span class="cp"></span>
@@ -1256,11 +1249,11 @@ we look up the line number at the same index as the current instruction&rsquo;s 
 in the code array.</p>
 <aside name="side">
 <p>This braindead encoding does do one thing right: it keeps the line information
-in a <em>separate</em> array instead of interleaving it in the bytecode itself.</p>
-<p>Since line information is only used when a runtime error occurs, we don&rsquo;t want
-it next to the bytecode, taking up precious space in the CPU cache and causing
-more cache misses as the interpreter skips past it to get to the real
-instructions it cares about.</p>
+in a <em>separate</em> array instead of interleaving it in the bytecode itself. Since
+line information is only used when a runtime error occurs, we don&rsquo;t want it
+between the instructions, taking up precious space in the CPU cache and causing
+more cache misses as the interpreter skips past it to get to the opcodes and
+operands it cares about.</p>
 </aside>
 <p>To implement this, we add another array to Chunk:</p>
 <div class="codehilite"><pre class="insert-before"><span></span>  <span class="kt">uint8_t</span><span class="o">*</span> <span class="n">code</span><span class="p">;</span>       
@@ -1558,7 +1551,7 @@ language. You&rsquo;ll thank me for it.</p>
 <a href="a-virtual-machine.html" class="next">
   Next Chapter: &ldquo;A Virtual Machine&rdquo; &rarr;
 </a>
-Hand-crafted by Robert Nystrom&ensp;&mdash;&ensp;<a href="https://github.com/munificent/craftinginterpreters/blob/master/LICENSE" target="_blank">&copy; 2015&hairsp;&ndash;&hairsp;2018</a>
+Hand-crafted by Robert Nystrom&ensp;&mdash;&ensp;<a href="https://github.com/munificent/craftinginterpreters/blob/master/LICENSE" target="_blank">&copy; 2015&hairsp;&ndash;&hairsp;2020</a>
 </footer>
 </article>
 

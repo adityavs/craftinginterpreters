@@ -3,7 +3,7 @@
 
 > Take big bites. Anything worth doing is worth overdoing.
 >
-> <cite>Robert A. Heinlein</cite>
+> <cite>Robert A. Heinlein, <em>Time Enough for Love</em></cite>
 
 The first step in any compiler or interpreter is <span
 name="lexing">scanning</span>. The scanner takes in raw source code as a series
@@ -16,7 +16,7 @@ This task has been variously called "scanning" and "lexing" (short for "lexical
 analysis") over the years. Way back when computers were as big as Winnebagos but
 had less memory than your watch, some people used "scanner" only to refer to the
 piece of code that dealt with reading raw source code characters from disk and
-buffering them in memory. Then "lexing" was the phase after that that did useful
+buffering them in memory. Then "lexing" was the subsequent phase that did useful
 stuff with the characters.
 
 These days, reading a source file into memory is trivial, so it's rarely a
@@ -545,7 +545,7 @@ newline inside a string.
 Finally, the last interesting bit is that when we create the token, we also
 produce the actual string *value* that will be used later by the interpreter.
 Here, that conversion only requires a `substring()` to strip off the surrounding
-quotes. If Lox supported escapes sequences like `\n`, we'd unescape those here.
+quotes. If Lox supported escape sequences like `\n`, we'd unescape those here.
 
 ### Number literals
 
@@ -869,10 +869,10 @@ And now you know why Python's `lambda` only allows a single expression body.
     previous newline into a semicolon to get something grammatically valid.
 
     This design note would turn into a design diatribe if I went into complete
-    detail about how that even *works*, much less all the various ways that that
-    is a bad idea. It's a mess. JavaScript is the only language I know where
-    many style guides demand explicit semicolons after every statement even
-    though the language theoretically lets you elide them.
+    detail about how that even *works*, much less all the various ways that
+    JavaScript's "solution" is a bad idea. It's a mess. JavaScript is the only
+    language I know where many style guides demand explicit semicolons after
+    every statement even though the language theoretically lets you elide them.
 
 If you're designing a new language, you almost surely *should* avoid an explicit
 statement terminator. Programmers are creatures of fashion like other humans and

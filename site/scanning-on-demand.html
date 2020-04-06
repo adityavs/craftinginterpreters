@@ -10,9 +10,10 @@
 <link rel="stylesheet" type="text/css" href="style.css" />
 
 <!-- Oh, God, Source Code Pro is so beautiful it makes me want to cry. -->
-<link href='http://fonts.googleapis.com/css?family=Source+Code+Pro:400|Source+Sans+Pro:300,400,600' rel='stylesheet' type='text/css'>
+<link href='https://fonts.googleapis.com/css?family=Source+Code+Pro:400|Source+Sans+Pro:300,400,600' rel='stylesheet' type='text/css'>
+
 <link rel="icon" type="image/png" href="image/favicon.png" />
-<script src="jquery-1.10.1.min.js"></script>
+<script src="jquery-3.4.1.min.js"></script>
 <script src="script.js"></script>
 
 <!-- Google analytics -->
@@ -92,9 +93,9 @@
   <h1>Scanning on Demand</h1>
 
 <div class="sign-up closable">
-    <h1>This book is a work in progress!</h1>
+  <h1>This book is a work in progress!</h1>
     <span class="dismiss">&times;</span>
-    <p>If you see a mistake, find something unclear, or have a suggestion, please <a href="https://github.com/munificent/craftinginterpreters/issues" target="_blank">let me know</a>. To learn when new chapters are up, join the mailing list:</p>
+    <p>If you see a mistake, find something unclear, or have a suggestion, please <a href="https://github.com/munificent/craftinginterpreters/issues" target="_blank">let me know</a>. To follow its progress, please join the mailing list:</p>
 
   <!-- Begin MailChimp Signup Form -->
   <div id="mc_embed_signup">
@@ -110,8 +111,10 @@
 </div>
 
 <blockquote>
-<p>Literature is idiosyncratic arrangements in horizontal lines in only twenty-six symbols, ten arabic numbers, and about eight punctuation marks.</p>
-<p><cite>Kurt Vonnegut</cite></p>
+<p>Literature is idiosyncratic arrangements in horizontal lines in only
+twenty-six phonetic symbols, ten Arabic numbers, and about eight punctuation
+marks.</p>
+<p><cite>Kurt Vonnegut, <em>A Man Without a Country</em></cite></p>
 </blockquote>
 <p>Our second interpreter, clox, has three phases<span class="em">&mdash;</span>scanner, compiler, and virtual
 machine. A data structure joins each pair of phases. Tokens flow from scanner to
@@ -168,8 +171,9 @@ add to top of file</div>
 <div class="source-file-narrow"><em>main.c</em>, add to top of file</div>
 
 <p>And now to get the REPL up and REPL-ing:</p>
-<div class="codehilite"><div class="source-file"><em>main.c</em></div>
-<pre><span></span><span class="k">static</span> <span class="kt">void</span> <span class="nf">repl</span><span class="p">()</span> <span class="p">{</span>                        
+<div class="codehilite"><pre class="insert-before"><span></span><span class="cp">#include</span> <span class="cpf">&quot;vm.h&quot;                             </span><span class="cp"></span>
+</pre><div class="source-file"><em>main.c</em></div>
+<pre class="insert"><br><span></span><span class="k">static</span> <span class="kt">void</span> <span class="nf">repl</span><span class="p">()</span> <span class="p">{</span>                        
   <span class="kt">char</span> <span class="n">line</span><span class="p">[</span><span class="mi">1024</span><span class="p">];</span>                          
   <span class="k">for</span> <span class="p">(;;)</span> <span class="p">{</span>                                
     <span class="n">printf</span><span class="p">(</span><span class="s">&quot;&gt; &quot;</span><span class="p">);</span>
@@ -196,7 +200,7 @@ add after <em>repl</em>()</div>
 <pre><span></span><span class="k">static</span> <span class="kt">void</span> <span class="nf">runFile</span><span class="p">(</span><span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">path</span><span class="p">)</span> <span class="p">{</span>           
   <span class="kt">char</span><span class="o">*</span> <span class="n">source</span> <span class="o">=</span> <span class="n">readFile</span><span class="p">(</span><span class="n">path</span><span class="p">);</span>                  
   <span class="n">InterpretResult</span> <span class="n">result</span> <span class="o">=</span> <span class="n">interpret</span><span class="p">(</span><span class="n">source</span><span class="p">);</span>     
-  <span class="n">free</span><span class="p">(</span><span class="n">source</span><span class="p">);</span> <span class="c1">// [owner]                        </span>
+  <span class="n">free</span><span class="p">(</span><span class="n">source</span><span class="p">);</span><span name="owner"> </span>
 
   <span class="k">if</span> <span class="p">(</span><span class="n">result</span> <span class="o">==</span> <span class="n">INTERPRET_COMPILE_ERROR</span><span class="p">)</span> <span class="n">exit</span><span class="p">(</span><span class="mi">65</span><span class="p">);</span>
   <span class="k">if</span> <span class="p">(</span><span class="n">result</span> <span class="o">==</span> <span class="n">INTERPRET_RUNTIME_ERROR</span><span class="p">)</span> <span class="n">exit</span><span class="p">(</span><span class="mi">70</span><span class="p">);</span>
@@ -257,9 +261,9 @@ standard library, can fail. If this were Java, the failures would be thrown as
 exceptions and automatically unwind the stack so we wouldn&rsquo;t <em>really</em> need to
 handle them. In C, if we don&rsquo;t check for them, they silently get ignored.</p>
 <p>This isn&rsquo;t really a book on good C programming practice, but I hate to encourage
-bad style, so lets go ahead and handle the errors. It&rsquo;s good for us, like eating
-our vegetables or flossing.</p>
-<p>Fortunately, we don&rsquo;t need to do anything particulary clever if a failure
+bad style, so let&rsquo;s go ahead and handle the errors. It&rsquo;s good for us, like
+eating our vegetables or flossing.</p>
+<p>Fortunately, we don&rsquo;t need to do anything particularly clever if a failure
 occurs. If we can&rsquo;t correctly read the user&rsquo;s script, all we can really do is
 tell the user and exit the interpreter gracefully. First up, we might fail to
 open the file:</p>
@@ -435,17 +439,16 @@ reporting. That&rsquo;s it! We don&rsquo;t even keep a pointer to the beginning 
 source code string. The scanner works its way through the code once and is done
 after that.</p>
 <p>Since we have some state, we should initialize it:</p>
-<div class="codehilite"><pre class="insert-before"><span></span><span class="n">Scanner</span> <span class="n">scanner</span><span class="p">;</span>                      
-</pre><div class="source-file"><em>scanner.c</em><br>
-add after struct <em>Scanner</em></div>
-<pre class="insert"><br><span></span><span class="kt">void</span> <span class="nf">initScanner</span><span class="p">(</span><span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">source</span><span class="p">)</span> <span class="p">{</span>
+<div class="codehilite"><div class="source-file"><em>scanner.c</em><br>
+add after variable <em>Scanner</em></div>
+<pre><span></span><span class="kt">void</span> <span class="nf">initScanner</span><span class="p">(</span><span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">source</span><span class="p">)</span> <span class="p">{</span>
   <span class="n">scanner</span><span class="p">.</span><span class="n">start</span> <span class="o">=</span> <span class="n">source</span><span class="p">;</span>             
   <span class="n">scanner</span><span class="p">.</span><span class="n">current</span> <span class="o">=</span> <span class="n">source</span><span class="p">;</span>           
   <span class="n">scanner</span><span class="p">.</span><span class="n">line</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>                   
 <span class="p">}</span>                                     
 </pre></div>
 
-<div class="source-file-narrow"><em>scanner.c</em>, add after struct <em>Scanner</em></div>
+<div class="source-file-narrow"><em>scanner.c</em>, add after variable <em>Scanner</em></div>
 
 <p>We start at the very first character on the very first line, like a runner
 crouched and ready to run.</p>
@@ -475,7 +478,7 @@ in <em>compile</em>()</div>
     <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>                                                                  
       <span class="n">printf</span><span class="p">(</span><span class="s">&quot;   | &quot;</span><span class="p">);</span>                                                        
     <span class="p">}</span>                                                                         
-    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;%2d &#39;%.*s&#39;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">token</span><span class="p">.</span><span class="n">type</span><span class="p">,</span> <span class="n">token</span><span class="p">.</span><span class="n">length</span><span class="p">,</span> <span class="n">token</span><span class="p">.</span><span class="n">start</span><span class="p">);</span> <span name="format"></span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;%2d &#39;%.*s&#39;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">token</span><span class="p">.</span><span class="n">type</span><span class="p">,</span> <span class="n">token</span><span class="p">.</span><span class="n">length</span><span class="p">,</span> <span class="n">token</span><span class="p">.</span><span class="n">start</span><span class="p">);</span><span name="format"> </span>
 
     <span class="k">if</span> <span class="p">(</span><span class="n">token</span><span class="p">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">TOKEN_EOF</span><span class="p">)</span> <span class="k">break</span><span class="p">;</span>                                       
   <span class="p">}</span>                                                                           
@@ -495,7 +498,7 @@ into the original source string and doesn&rsquo;t have a terminator at the end.<
 <p>This loops indefinitely. Each turn through the loop, it scans one token and
 prints it. When it reaches a special &ldquo;end of file&rdquo; token, it stops. For example,
 if we run the interpreter on this program:</p>
-<div class="codehilite"><pre><span></span>print 1 + 2;
+<div class="codehilite"><pre><span></span><span class="k">print</span> <span class="mi">1</span> <span class="o">+</span> <span class="mi">2</span><span class="p">;</span>
 </pre></div>
 
 
@@ -566,7 +569,7 @@ identical to the one in jlox, so let&rsquo;s just hammer out the whole thing:</p
 
   <span class="c1">// Keywords.                                        </span>
   <span class="n">TOKEN_AND</span><span class="p">,</span> <span class="n">TOKEN_CLASS</span><span class="p">,</span> <span class="n">TOKEN_ELSE</span><span class="p">,</span> <span class="n">TOKEN_FALSE</span><span class="p">,</span>    
-  <span class="n">TOKEN_FUN</span><span class="p">,</span> <span class="n">TOKEN_FOR</span><span class="p">,</span> <span class="n">TOKEN_IF</span><span class="p">,</span> <span class="n">TOKEN_NIL</span><span class="p">,</span> <span class="n">TOKEN_OR</span><span class="p">,</span>
+  <span class="n">TOKEN_FOR</span><span class="p">,</span> <span class="n">TOKEN_FUN</span><span class="p">,</span> <span class="n">TOKEN_IF</span><span class="p">,</span> <span class="n">TOKEN_NIL</span><span class="p">,</span> <span class="n">TOKEN_OR</span><span class="p">,</span>
   <span class="n">TOKEN_PRINT</span><span class="p">,</span> <span class="n">TOKEN_RETURN</span><span class="p">,</span> <span class="n">TOKEN_SUPER</span><span class="p">,</span> <span class="n">TOKEN_THIS</span><span class="p">,</span> 
   <span class="n">TOKEN_TRUE</span><span class="p">,</span> <span class="n">TOKEN_VAR</span><span class="p">,</span> <span class="n">TOKEN_WHILE</span><span class="p">,</span>                 
 
@@ -597,8 +600,8 @@ all and we can freely copy tokens around. As long as the main source code string
 <span name="outlive">outlives</span> all of the tokens, everything works fine.</p>
 <aside name="outlive">
 <p>I don&rsquo;t mean to sound flippant. We really do need to think about and ensure that
-the source string, which is created far away over in the main module, has a long
-enough lifetime. That&rsquo;s why <code>runFile()</code> doesn&rsquo;t free the string until
+the source string, which is created far away over in the &ldquo;main&rdquo; module, has a
+long enough lifetime. That&rsquo;s why <code>runFile()</code> doesn&rsquo;t free the string until
 <code>interpret()</code> finishes executing the code and returns.</p>
 </aside>
 <h3><a href="#scanning-tokens" name="scanning-tokens"><small>16&#8202;.&#8202;2&#8202;.&#8202;1</small> Scanning tokens</a></h3>
@@ -907,7 +910,7 @@ add after <em>skipWhitespace</em>()</div>
 
   <span class="k">if</span> <span class="p">(</span><span class="n">isAtEnd</span><span class="p">())</span> <span class="k">return</span> <span class="n">errorToken</span><span class="p">(</span><span class="s">&quot;Unterminated string.&quot;</span><span class="p">);</span>
 
-  <span class="c1">// The closing &quot;.                                        </span>
+  <span class="c1">// The closing quote.                                    </span>
   <span class="n">advance</span><span class="p">();</span>                                               
   <span class="k">return</span> <span class="n">makeToken</span><span class="p">(</span><span class="n">TOKEN_STRING</span><span class="p">);</span>                          
 <span class="p">}</span>                                                          
@@ -967,7 +970,7 @@ add after <em>skipWhitespace</em>()</div>
 
   <span class="c1">// Look for a fractional part.             </span>
   <span class="k">if</span> <span class="p">(</span><span class="n">peek</span><span class="p">()</span> <span class="o">==</span> <span class="sc">&#39;.&#39;</span> <span class="o">&amp;&amp;</span> <span class="n">isDigit</span><span class="p">(</span><span class="n">peekNext</span><span class="p">()))</span> <span class="p">{</span>
-    <span class="c1">// Consume the &quot;.&quot;                       </span>
+    <span class="c1">// Consume the &quot;.&quot;.                      </span>
     <span class="n">advance</span><span class="p">();</span>                               
 
     <span class="k">while</span> <span class="p">(</span><span class="n">isDigit</span><span class="p">(</span><span class="n">peek</span><span class="p">()))</span> <span class="n">advance</span><span class="p">();</span>       
@@ -1307,7 +1310,7 @@ needed to?</p>
 <a href="compiling-expressions.html" class="next">
   Next Chapter: &ldquo;Compiling Expressions&rdquo; &rarr;
 </a>
-Hand-crafted by Robert Nystrom&ensp;&mdash;&ensp;<a href="https://github.com/munificent/craftinginterpreters/blob/master/LICENSE" target="_blank">&copy; 2015&hairsp;&ndash;&hairsp;2018</a>
+Hand-crafted by Robert Nystrom&ensp;&mdash;&ensp;<a href="https://github.com/munificent/craftinginterpreters/blob/master/LICENSE" target="_blank">&copy; 2015&hairsp;&ndash;&hairsp;2020</a>
 </footer>
 </article>
 

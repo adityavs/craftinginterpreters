@@ -1,9 +1,11 @@
 ^title Scanning on Demand
 ^part A Bytecode Virtual Machine
 
-> Literature is idiosyncratic arrangements in horizontal lines in only twenty-six symbols, ten arabic numbers, and about eight punctuation marks.
+> Literature is idiosyncratic arrangements in horizontal lines in only
+> twenty-six phonetic symbols, ten Arabic numbers, and about eight punctuation
+> marks.
 >
-> <cite>Kurt Vonnegut</cite>
+> <cite>Kurt Vonnegut, <em>A Man Without a Country</em></cite>
 
 Our second interpreter, clox, has three phases -- scanner, compiler, and virtual
 machine. A data structure joins each pair of phases. Tokens flow from scanner to
@@ -48,7 +50,7 @@ We'll need a few system headers, so let's get them all out of the way:
 
 And now to get the REPL up and REPL-ing:
 
-^code repl
+^code repl (1 before)
 
 A quality REPL handles input that spans multiple lines gracefully and doesn't
 have a hardcoded line length limit. This REPL here is a little more, ahem,
@@ -105,10 +107,10 @@ exceptions and automatically unwind the stack so we wouldn't *really* need to
 handle them. In C, if we don't check for them, they silently get ignored.
 
 This isn't really a book on good C programming practice, but I hate to encourage
-bad style, so lets go ahead and handle the errors. It's good for us, like eating
-our vegetables or flossing.
+bad style, so let's go ahead and handle the errors. It's good for us, like
+eating our vegetables or flossing.
 
-Fortunately, we don't need to do anything particulary clever if a failure
+Fortunately, we don't need to do anything particularly clever if a failure
 occurs. If we can't correctly read the user's script, all we can really do is
 tell the user and exit the interpreter gracefully. First up, we might fail to
 open the file:
@@ -209,7 +211,7 @@ after that.
 
 Since we have some state, we should initialize it:
 
-^code init-scanner (1 before)
+^code init-scanner
 
 We start at the very first character on the very first line, like a runner
 crouched and ready to run.
@@ -250,13 +252,13 @@ This loops indefinitely. Each turn through the loop, it scans one token and
 prints it. When it reaches a special "end of file" token, it stops. For example,
 if we run the interpreter on this program:
 
-```
+```lox
 print 1 + 2;
 ```
 
 It prints out:
 
-```
+```text
    1 31 'print'
    | 21 '1'
    |  7 '+'
@@ -317,8 +319,8 @@ all and we can freely copy tokens around. As long as the main source code string
 <aside name="outlive">
 
 I don't mean to sound flippant. We really do need to think about and ensure that
-the source string, which is created far away over in the main module, has a long
-enough lifetime. That's why `runFile()` doesn't free the string until
+the source string, which is created far away over in the "main" module, has a
+long enough lifetime. That's why `runFile()` doesn't free the string until
 `interpret()` finishes executing the code and returns.
 
 </aside>
@@ -791,6 +793,7 @@ writing the simplest code I can is sufficient to accomplish that.
 
     Would print:
 
+        :::text
         Tea will be ready in 6 minutes.
 
     What token types would you define to implement a scanner for string

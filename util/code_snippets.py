@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 """
@@ -51,8 +50,10 @@ BEGIN_CHAPTER_PATTERN = re.compile(r'//> ([A-Z][A-Za-z\s]+) ([-a-z0-9]+)')
 END_CHAPTER_PATTERN = re.compile(r'//< ([A-Z][A-Za-z\s]+) ([-a-z0-9]+)')
 
 # Hacky regexes that matches a function, method or constructor declaration.
-FUNCTION_PATTERN = re.compile(r'(\w+)>*\*? (\w+)\(')
 CONSTRUCTOR_PATTERN = re.compile(r'^  ([A-Z][a-z]\w+)\(')
+FUNCTION_PATTERN = re.compile(r'(\w+)>*\*? (\w+)\(([^)]*)')
+MODULE_PATTERN = re.compile(r'^(\w+) (\w+);')
+STRUCT_PATTERN = re.compile(r'struct (s\w+)? {')
 TYPE_PATTERN = re.compile(r'(public )?(abstract )?(class|enum|interface) ([A-Z]\w+)')
 TYPEDEF_PATTERN = re.compile(r'typedef (enum|struct|union)( \w+)? {')
 TYPEDEF_NAME_PATTERN = re.compile(r'\} (\w+);')
@@ -75,6 +76,11 @@ class SourceCode:
 
 
   def find_snippet_tag(self, chapter, name):
+    if not chapter in self.snippet_tags:
+      print('Error: "{}" does not contain snippet "{}".'.format(chapter, name),
+          file=sys.stderr)
+      return None
+
     snippets = self.snippet_tags[chapter]
 
     if name in snippets:
@@ -108,7 +114,7 @@ class SourceCode:
     last_lines = {}
 
     # Create a new snippet for [name] if it doesn't already exist.
-    def ensure_snippet(name, line_num):
+    def ensure_snippet(name, line_num = None):
       if not name in snippets:
         snippet = Snippet(file, name)
         snippets[name] = snippet
@@ -116,6 +122,8 @@ class SourceCode:
         return snippet
 
       snippet = snippets[name]
+      if first_lines[snippet] is None:
+        first_lines[snippet] = line_num
       if name != 'not-yet' and name != 'omit' and snippet.file.path != file.path:
         print('Error: "{} {}" appears in two files, {} and {}.'.format(
                 chapter, name, snippet.file.path, file.path),
@@ -137,9 +145,8 @@ class SourceCode:
             snippet.location = line.location
 
         if line.end and line.end.chapter == chapter:
-          snippet = ensure_snippet(line.end.name, line_num)
+          snippet = ensure_snippet(line.end.name)
           snippet.removed.append(line.text)
-          last_lines[snippet] = line_num
 
         line_num += 1
 
@@ -228,7 +235,12 @@ class SourceLine:
   def __init__(self, text, location, start, end):
     self.text = text
     self.location = location
+
+    # The first snippet where this line appears in the book.
     self.start = start
+
+    # The last snippet where this line is removed, or None if the line reaches
+    # the end of the book.
     self.end = end
 
   def is_present(self, snippet):
@@ -259,18 +271,25 @@ class Location:
   The context in which a line of code appears. The chain of types and functions
   it's in.
   """
-  def __init__(self, parent, kind, name):
+  def __init__(self, parent, kind, name, signature=None):
     self.parent = parent
     self.kind = kind
     self.name = name
+    self.signature = signature
 
   def __str__(self):
     result = self.kind + ' ' + self.name
+    if self.signature:
+      result += "(" + self.signature + ")"
     if self.parent:
       result = str(self.parent) + ' > ' + result
     return result
 
   def __eq__(self, other):
+    # Note: Signature is deliberately not considered part of equality. There's
+    # a case in calls-and-functions where the signature of a function changes
+    # and it confuses the build script if we treat the signatures as
+    # significant.
     return other != None and self.kind == other.kind and self.name == other.name
 
   @property
@@ -292,6 +311,14 @@ class Location:
       return 'nest inside class <em>{}</em>'.format(self.parent.name)
 
     if self.is_function and preceding == self:
+      # Hack. There's one place where we add a new overload and that shouldn't
+      # be treated as in the same function. But we can't always look at the
+      # signature because there's another place where a change signature would
+      # confuse the build script. So just check for the one-off case here.
+      if self.name == 'resolve' and self.signature == 'Expr expr':
+        return 'add after <em>{}</em>({})'.format(
+            preceding.name, preceding.signature)
+
       # We're still inside a function.
       return 'in <em>{}</em>()'.format(self.name)
 
@@ -477,10 +504,15 @@ def load_file(source_code, source_dir, path):
           current_location = Location(
               current_location,
               'method' if file.path.endswith('.java') else 'function',
-              match.group(2))
+              match.group(2),
+              match.group(3))
           # TODO: What about declarations with aside comments:
           #   void foo(); // [wat]
           is_function_declaration = line.endswith(';')
+
+          # Hack: Handle multi-line declarations.
+          if line.endswith(',') and lines[line_num].endswith(';'):
+            is_function_declaration = True
 
       match = CONSTRUCTOR_PATTERN.match(line)
       if match:
@@ -494,10 +526,19 @@ def load_file(source_code, source_dir, path):
           current_location = Location(current_location,
                                       match.group(3), match.group(4))
 
+      match = STRUCT_PATTERN.match(line)
+      if match:
+        current_location = Location(current_location, 'struct', match.group(1))
+
       match = TYPEDEF_PATTERN.match(line)
       if match:
         # We don't know the name of the typedef.
         current_location = Location(current_location, match.group(1), '???')
+
+      match = MODULE_PATTERN.match(line)
+      if match:
+        current_location = Location(current_location, 'variable',
+                                    match.group(1))
 
       match = BLOCK_PATTERN.match(line)
       if match:
@@ -587,6 +628,10 @@ def load_file(source_code, source_dir, path):
       # If we reached a function declaration, not a definition, then it's done
       # after one line.
       if is_function_declaration:
+        current_location = current_location.parent
+
+      # Module variables are only a single line.
+      if current_location.kind == 'variable':
         current_location = current_location.parent
 
       # Hack. There is a one-line class in Parser.java.

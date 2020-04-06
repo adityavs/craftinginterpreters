@@ -5,7 +5,7 @@
 > sometimes that a Thing which seemed very Thingish inside you is quite
 > different when it gets out into the open and has other people looking at it.
 >
-> <cite>A.A. Milne</cite>
+> <cite>A.A. Milne, <em>Winnie-the-Pooh</em></cite>
 
 The past few chapters were huge, packed full of complex techniques and pages of
 code. In this chapter, there's only one new concept to learn and a scattering of
@@ -41,7 +41,7 @@ In order to choose a value representation, we need to answer two key questions:
 
 1.  **How do we represent the type of a value?** If you try to, say, multiply a
     number by `true`, we need to detect that error at runtime and report it. In
-    order to do that, we need to be able tell what a value's type is.
+    order to do that, we need to be able to tell what a value's type is.
 
 2.  **How do we store the value itself?** We need to not only be able to tell
     that three is a number, but that it's different from the number four. I
@@ -67,7 +67,7 @@ When we get to adding classes to the language, each class the user defines
 doesn't need its own entry in this enum. As far as the VM is concerned, every
 instance of a class is the same type: "instance".
 
-In other word's, this is the VM's notion of "type", not the user's.
+In other words, this is the VM's notion of "type", not the user's.
 
 </aside>
 
@@ -86,7 +86,7 @@ looks like a struct except that all of its fields overlap in memory:
 <aside name="sum">
 
 If you're familiar with a language in the ML family, structs and unions in C
-roughly mirror the difference between sum and product types, between tuples
+roughly mirror the difference between product and sum types, between tuples
 and algebraic data types.
 
 </aside>
@@ -126,13 +126,13 @@ because it reads nicely, almost like a cast, when you pull the value out.
 
 <img src="image/types-of-values/value.png" alt="The full value struct, with the type and as fields next to each other in memory." />
 
-The type tag comes first followed by the union. You're probably wondering why we
-need a full eight bytes for the type tag when it only needs to store a number
-between zero and three. We *could* pack the enum into a single byte, or even a
-bit field. But most architectures prefer values be aligned to their size. Since
-the union field contains an eight-byte double, the compiler will <span
-name="pad">pad</span> the type field out to eight bytes to keep that double on
-the nearest eight-byte boundary.
+The four-byte type tag comes first, then the union. Most architectures prefer
+values be aligned to their size. Since the union field contains an eight-byte
+double, the compiler adds four bytes of <span name="pad">padding</span> after
+the type field to keep that double on the nearest eight-byte boundary. That
+means we're effectively spending eight bytes on the type tag, which only needs
+to represent a number between zero and three. We could stuff the enum in a
+smaller size, but all that would do is increase the padding.
 
 <aside name="pad">
 
@@ -147,7 +147,7 @@ So our values are 16 bytes, which seems a little large. We'll improve it
 [later][optimization]. In the meantime, they're still small enough to store on
 the C stack and pass around by value. Lox's semantics allow that because the
 only types we support so far are **immutable**. If we pass a copy of a Value
-containing the number three to some function, we don't need worry about the
+containing the number three to some function, we don't need to worry about the
 caller seeing modifications to the value. You can't "modify" three. It's three
 forever.
 
@@ -160,7 +160,7 @@ clox assumes Value is an alias for `double`. We have code that does a straight C
 cast from one to the other. That code is all broken now. So sad.
 
 With our new representation, a Value can *contain* a double, but it's not
-*equivalent* to it. There is an mandatory conversion step to get from one to the
+*equivalent* to it. There is a mandatory conversion step to get from one to the
 other. We need to go through the code and insert those conversions to get clox
 working again.
 
@@ -254,10 +254,10 @@ For unary negate, the check looks like this:
 
 ^code op-negate (1 before, 1 after)
 
-First, we check to see if the value on top of the stack is a number. If we not,
-we report the runtime error and <span name="halt">stop</span> the interpreter.
-Otherwise, we keep going. Only after this validation do we unwrap the operand,
-negate it, wrap the result and push it.
+First, we check to see if the value on top of the stack is a number. If it's
+not, we report the runtime error and <span name="halt">stop</span> the
+interpreter. Otherwise, we keep going. Only after this validation do we unwrap
+the operand, negate it, wrap the result and push it.
 
 <aside name="halt">
 
@@ -292,10 +292,21 @@ out of over the remainder of the book:
 
 You've certainly *called* variadic functions -- ones that take a varying number
 of arguments -- in C before: `printf()` is one. But you may not have *defined*
-your own. This book isn't a C tutorial, so I'll skim it here, but basically the
-`...` and `va_list` stuff let us pass an arbitrary number of arguments to
-`runtimeError()`. It forwards those on to `vfprintf()`, which is the flavor of
-`printf()` that takes an explicit `va_list`.
+your own. This book isn't a C <span name="tutorial">tutorial</span>, so I'll
+skim over it here, but basically the `...` and `va_list` stuff let us pass an
+arbitrary number of arguments to `runtimeError()`. It forwards those on to
+`vfprintf()`, which is the flavor of `printf()` that takes an explicit
+`va_list`.
+
+<aside name="tutorial">
+
+If you are looking for a C tutorial, I love "[The C Programming Language][kr]",
+usually called "K&R" in honor of its authors. It's not entirely up to date, but
+the quality of the writing more than makes up for it.
+
+[kr]: https://www.cs.princeton.edu/~bwk/cbook.html
+
+</aside>
 
 Callers can pass a format string to `runtimeError()` followed by a number of
 arguments, just like they can when calling `printf()` directly. `runtimeError()`
@@ -310,11 +321,16 @@ in the debug information compiled into the chunk. If our compiler did its job
 right, that corresponds to the line of source code that the bytecode was
 compiled from.
 
+We look into the chunk's debug line array using the current bytecode instruction
+index *minus one*. That's because the interpreter advances past each instruction
+before executing it. So, at the point that we call `runtimeError()`, the failed
+instruction is the previous one.
+
 <aside name="stack">
 
 Just showing the immediate line where the error occurred doesn't provide much
 context. Better would be a full stack trace. But we don't even have functions to
-call yet, so there is no callstack to trace.
+call yet, so there is no call stack to trace.
 
 </aside>
 
@@ -443,7 +459,7 @@ matter of taste.
 
 ^code interpret-literals (5 before, 1 after)
 
-This is pretty self-explanatory. Each instructions summons the appropriate value
+This is pretty self-explanatory. Each instruction summons the appropriate value
 and pushes it onto the stack. We shouldn't forget our disassembler either:
 
 ^code disassemble-literals (2 before, 1 after)
@@ -480,7 +496,7 @@ prefix `!` expression. We just need to slot it into the parsing table:
 
 ^code table-not (1 before, 1 after)
 
-Because I knew were going to do this, the `unary()` function already has a
+Because I knew we were going to do this, the `unary()` function already has a
 switch on the token type to figure out which bytecode instruction to output. We
 merely add another case:
 
@@ -527,10 +543,10 @@ need to be able to *un*-generate it in the disassembler:
 That wasn't too bad. Let's keep the momentum going and knock out the equality
 and comparison operators too: `==`, `!=`, `<`, `>`, `<=`, and `>=`. That covers
 all of the operators that return Boolean results except the logical operators
-`&&` and `||`. Since those need to short-circuit -- basically do a little
+`and` and `or`. Since those need to short-circuit -- basically do a little
 control flow -- we aren't ready for them yet.
 
-Here's the new instructions for those operators:
+Here are the new instructions for those operators:
 
 ^code comparison-ops (1 before, 1 after)
 
@@ -547,12 +563,26 @@ user-visible behavior.
 The expression `a != b` has the same semantics as `!(a == b)`, so the compiler
 is free to compile the former as if it were the latter. Instead of a dedicated
 `OP_NOT_EQUAL` instruction, it can output an `OP_EQUAL` followed by an `OP_NOT`.
-Likewise, `a <= b` is the same as `!(a > b)` and `a >= b` is `!(a < b)`. Thus,
-we only need three new instructions.
+Likewise, `a <= b` is the <span name="same">same</span> as `!(a > b)` and `a >=
+b` is `!(a < b)`. Thus, we only need three new instructions.
+
+<aside name="same" class="bottom">
+
+*Is* `a <= b` always the same as `!(a > b)`? According to [IEEE 754][], all
+comparison operators return false when an operand is NaN. That means `NaN <= 1`
+is false and `NaN > 1` is also false. But our desugaring assumes the latter is
+always the negation of the former.
+
+For the book, we won't get hung up on this, but these kinds of details will
+matter in your real language implementations.
+
+[ieee 754]: https://en.wikipedia.org/wiki/IEEE_754
+
+</aside>
 
 Over in the parser, though, we do have six new operators to slot into the parse
 table. We use the same `binary()` parser function from before. Here's the row
-for `==`:
+for `!=`:
 
 ^code table-equal (1 before, 1 after)
 
@@ -578,7 +608,7 @@ You can evaluate `==` on any pair of objects, even objects of different types.
 There's enough complexity that it makes sense to shunt that logic over to a
 separate function. That function always returns a C `bool`, so we can safely
 wrap the result in a `BOOL_VAL`. The function relates to values, so it lives
-over in the value module:
+over in the "value" module:
 
 ^code values-equal-h (2 before, 1 after)
 

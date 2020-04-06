@@ -279,14 +279,14 @@ choice not to evaluate it becomes user-visible.
 Since we don't have the conditional operator, you might think we're done with
 branching, but no. Even without the ternary operator, there are two other
 operators that are technically control flow constructs -- the logical operators
-and (`&&`) and or (`||`).
+`and` and `or`.
 
 These aren't like other binary operators because they **short-circuit**. If,
 after evaluating the left operand, we know what the result of the logical
 expression must be, we don't evaluate the right operand. For example:
 
 ```lox
-false && sideEffect();
+false and sideEffect();
 ```
 
 For an and expression to evaluate to something truthy, both operands must be
@@ -296,10 +296,9 @@ it gets skipped.
 
 This is why we didn't implement the logical operators with the other binary
 operators. Now we're ready. The two new operators are low in the precedence
-table. As in C, they each have their <span name="logical">own</span> precedence
-with `||` lower than `&&`. We slot them right between `assignment` and
-`equality`:
-
+table. Similar to `||` and `&&` in C, they each have their <span
+name="logical">own</span> precedence with `or` lower than `and`. We slot them
+right between `assignment` and `equality`:
 
 <aside name="logical">
 
@@ -449,7 +448,7 @@ code.
 
 ## For Loops
 
-We're down to the last flow control construct, <span name="for">Ye Olde</span>
+We're down to the last control flow construct, <span name="for">Ye Olde</span>
 C-style for loop. I probably don't need to remind you, but it looks like this:
 
 ```lox
@@ -482,7 +481,7 @@ being looped over supports.
 Those are great. For Lox, though, we're limited by building up the interpreter a
 chapter at a time. We don't have objects and methods yet, so we have no way of
 defining an iteration protocol that the for loop could use. So we'll stick with
-the old school C for loop. Think of it as "vintage". The fixie of flow control
+the old school C for loop. Think of it as "vintage". The fixie of control flow
 statements.
 
 </aside>
@@ -714,8 +713,9 @@ syntax to get out of the way of the semantics, so they focus on keeping both the
 grammar and libraries simple. Code should be obvious more than beautiful.
 
 Somewhere in the middle you have languages like Java, C# and Python. Eventually
-you reach Ruby, C++, Perl, and D, languages who have stuffed so much syntax into
-their grammar, they are running out of punctuation characters on the keyboard.
+you reach Ruby, C++, Perl, and D, languages which have stuffed so much syntax
+into their grammar, they are running out of punctuation characters on the
+keyboard.
 
 To some degree, location on the spectrum correlates with age. It's relatively
 easy to add bits of syntactic sugar in later releases. New syntax is a crowd

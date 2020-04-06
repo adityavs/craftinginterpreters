@@ -10,9 +10,10 @@
 <link rel="stylesheet" type="text/css" href="style.css" />
 
 <!-- Oh, God, Source Code Pro is so beautiful it makes me want to cry. -->
-<link href='http://fonts.googleapis.com/css?family=Source+Code+Pro:400|Source+Sans+Pro:300,400,600' rel='stylesheet' type='text/css'>
+<link href='https://fonts.googleapis.com/css?family=Source+Code+Pro:400|Source+Sans+Pro:300,400,600' rel='stylesheet' type='text/css'>
+
 <link rel="icon" type="image/png" href="image/favicon.png" />
-<script src="jquery-1.10.1.min.js"></script>
+<script src="jquery-3.4.1.min.js"></script>
 <script src="script.js"></script>
 
 <!-- Google analytics -->
@@ -96,9 +97,9 @@
   <h1>Parsing Expressions</h1>
 
 <div class="sign-up closable">
-    <h1>This book is a work in progress!</h1>
+  <h1>This book is a work in progress!</h1>
     <span class="dismiss">&times;</span>
-    <p>If you see a mistake, find something unclear, or have a suggestion, please <a href="https://github.com/munificent/craftinginterpreters/issues" target="_blank">let me know</a>. To learn when new chapters are up, join the mailing list:</p>
+    <p>If you see a mistake, find something unclear, or have a suggestion, please <a href="https://github.com/munificent/craftinginterpreters/issues" target="_blank">let me know</a>. To follow its progress, please join the mailing list:</p>
 
   <!-- Begin MailChimp Signup Form -->
   <div id="mc_embed_signup">
@@ -221,7 +222,7 @@ is by defining rules for precedence and associativity.</p>
 <li>
 <p><strong>Associativity</strong> determines which operator is evaluated first in a series
     of the <em>same</em> operator. When an operator is <strong>left-associative</strong> (think
-    &ldquo;left-to-right&rdquo;), operators on the left evaluate before ones of the right.
+    &ldquo;left-to-right&rdquo;), operators on the left evaluate before those on the right.
     Since <code>-</code> is left-associative, this expression:</p>
 <div class="codehilite"><pre><span></span><span class="mi">5</span> <span class="o">-</span> <span class="mi">3</span> <span class="o">-</span> <span class="mi">1</span>
 </pre></div>
@@ -313,7 +314,7 @@ that. For example, an operand of a <code>*</code> expression cannot be a <code>+
 name="paren">expression</span>, since the latter has lower precedence.</p>
 <aside name="paren">
 <p>Of course, it could be a <em>parenthesized</em> addition expression, but that&rsquo;s because
-the parentheses themeselves are treated as having the highest precedence.</p>
+the parentheses themselves are treated as having the highest precedence.</p>
 </aside>
 <p>For the multiplication operands, we need a nonterminal that means &ldquo;any kind of
 expression of higher precedence than <code>*</code>&rdquo;. Something like:</p>
@@ -414,7 +415,7 @@ and larger chunks of syntax.</p>
 <aside name="descent">
 <p>It&rsquo;s called &ldquo;recursive <em>descent</em>&rdquo; because it walks <em>down</em> the grammar.
 Confusingly, we also use direction metaphorically when talking about &ldquo;high&rdquo; and
-&ldquo;low&rdquo; precedence, but the orientation is reversed. In a top-down grammar, you
+&ldquo;low&rdquo; precedence, but the orientation is reversed. In a top-down parser, you
 reach the lowest-precedence expressions first because they may in turn contain
 subexpressions of higher precedence.</p>
 <p><img alt="Top-down grammar rules in order of increasing precedence." src="image/parsing-expressions/direction.png" /></p>
@@ -440,7 +441,7 @@ rule translates to code roughly like:</p>
 </tbody>
 </table>
 
-<p>It&rsquo;s called &ldquo;<em>recursive</em> descent&rdquo; because when a grammar rules refers to itself<span class="em">&mdash;</span>directly or indirectly<span class="em">&mdash;</span>that translates to recursive method calls.</p>
+<p>It&rsquo;s called &ldquo;<em>recursive</em> descent&rdquo; because when a grammar rule refers to itself<span class="em">&mdash;</span>directly or indirectly<span class="em">&mdash;</span>that translates to recursive method calls.</p>
 <h3><a href="#the-parser-class" name="the-parser-class"><small>6&#8202;.&#8202;2&#8202;.&#8202;1</small> The parser class</a></h3>
 <p>Each grammar rule becomes a method inside this new class:</p>
 <div class="codehilite"><div class="source-file"><em>lox/Parser.java</em><br>
@@ -534,9 +535,9 @@ add after <em>equality</em>()</div>
 
 <div class="source-file-narrow"><em>lox/Parser.java</em>, add after <em>equality</em>()</div>
 
-<p>It checks to see if the current token is any of the given types. If so, it
-consumes it and returns <code>true</code>. Otherwise, it returns <code>false</code> and leaves the
-token where it is.</p>
+<p>This checks to see if the current token is any of the given types. If so, it
+consumes the token and returns <code>true</code>. Otherwise, it returns <code>false</code> and leaves
+the token as the current one.</p>
 <p>The <code>match()</code> method is defined in terms of two more fundamental operations:</p>
 <div class="codehilite"><div class="source-file"><em>lox/Parser.java</em><br>
 add after <em>match</em>()</div>
@@ -693,8 +694,8 @@ add after <em>multiplication</em>()</div>
 
 <p>Again, we look at the <span name="current">current<span> token to see how to
 parse. If it&rsquo;s a <code>!</code> or <code>-</code>, we must have a unary expression. In that case, we
-grab the token, and then recursively call <code>unary()</code> again to the parse the
-operand. Wrap that all up in a unary expression syntax tree and we&rsquo;re done.</p>
+grab the token, and then recursively call <code>unary()</code> again to parse the operand.
+Wrap that all up in a unary expression syntax tree and we&rsquo;re done.</p>
 <aside name="current">
 <p>The fact that the parser looks ahead at upcoming tokens to decide how to parse
 puts recursive descent into the category of <strong>predictive parsers</strong>.</p>
@@ -783,11 +784,12 @@ runs the code, is it <em>really</em> an error?</p>
 really want to raise the ante beyond that. A decent parser should:</p>
 <ul>
 <li>
-<p><strong>Be fast.</strong> Computers are thousands of times faster than when parser
-    technology was first invented. The days of needing to optimize your parser
-    so that it could get through an entire source file during a coffee break are
-    over. But programmer expectations have risen as quickly, if not faster. They
-    expect their editors to reparse files in milliseconds after every keystroke.</p>
+<p><strong>Be fast.</strong> Computers are thousands of times faster than they were when
+    parser technology was first invented. The days of needing to optimize your
+    parser so that it could get through an entire source file during a coffee
+    break are over. But programmer expectations have risen as quickly, if not
+    faster. They expect their editors to reparse files in milliseconds after
+    every keystroke.</p>
 </li>
 <li>
 <p><strong>Report as many distinct errors as there are.</strong> Aborting after the first
@@ -911,8 +913,8 @@ parsing the extra arguments instead of freaking out and going into panic mode.</
 augment the grammar with a rule that matches the erroneous syntax. The parser
 safely parses it but then reports it as an error instead of producing a syntax
 tree.</p>
-<p>For example, some languages have an unary <code>+</code> operator, like <code>+123</code>, but Lox
-does not. Instead of getting confused when the parser stumbles onto a <code>+</code> at the
+<p>For example, some languages have a unary <code>+</code> operator, like <code>+123</code>, but Lox does
+not. Instead of getting confused when the parser stumbles onto a <code>+</code> at the
 beginning of an expression, we could extend the unary rule to allow it:</p>
 <div class="codehilite"><pre><span></span><span class="n">unary</span> <span class="err">→</span> <span class="p">(</span> <span class="s">&quot;!&quot;</span> <span class="err">|</span> <span class="s">&quot;-&quot;</span> <span class="err">|</span> <span class="s">&quot;+&quot;</span> <span class="p">)</span> <span class="n">unary</span>
         <span class="err">|</span> <span class="n">primary</span> <span class="p">;</span>
@@ -933,7 +935,7 @@ parser&rsquo;s own state?</p>
 <h3><a href="#synchronizing-a-recursive-descent-parser" name="synchronizing-a-recursive-descent-parser"><small>6&#8202;.&#8202;3&#8202;.&#8202;3</small> Synchronizing a recursive descent parser</a></h3>
 <p>With recursive descent, the parser&rsquo;s state<span class="em">&mdash;</span>which rules it is in the middle of
 recognizing<span class="em">&mdash;</span>is not stored explicitly in fields. Instead, we use Java&rsquo;s
-own callstack to track what the parser is doing. Each rule in the process of
+own call stack to track what the parser is doing. Each rule in the process of
 being parsed is a callframe on the stack. In order to reset that state, we need
 to clear out those callframes.</p>
 <p>The natural way to do that in Java is exceptions. When we want to synchronize,
@@ -1153,7 +1155,7 @@ compelling to get people to <em>want</em> to jump over.</p>
 <a href="evaluating-expressions.html" class="next">
   Next Chapter: &ldquo;Evaluating Expressions&rdquo; &rarr;
 </a>
-Hand-crafted by Robert Nystrom&ensp;&mdash;&ensp;<a href="https://github.com/munificent/craftinginterpreters/blob/master/LICENSE" target="_blank">&copy; 2015&hairsp;&ndash;&hairsp;2018</a>
+Hand-crafted by Robert Nystrom&ensp;&mdash;&ensp;<a href="https://github.com/munificent/craftinginterpreters/blob/master/LICENSE" target="_blank">&copy; 2015&hairsp;&ndash;&hairsp;2020</a>
 </footer>
 </article>
 

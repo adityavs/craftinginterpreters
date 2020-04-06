@@ -10,9 +10,10 @@
 <link rel="stylesheet" type="text/css" href="style.css" />
 
 <!-- Oh, God, Source Code Pro is so beautiful it makes me want to cry. -->
-<link href='http://fonts.googleapis.com/css?family=Source+Code+Pro:400|Source+Sans+Pro:300,400,600' rel='stylesheet' type='text/css'>
+<link href='https://fonts.googleapis.com/css?family=Source+Code+Pro:400|Source+Sans+Pro:300,400,600' rel='stylesheet' type='text/css'>
+
 <link rel="icon" type="image/png" href="image/favicon.png" />
-<script src="jquery-1.10.1.min.js"></script>
+<script src="jquery-3.4.1.min.js"></script>
 <script src="script.js"></script>
 
 <!-- Google analytics -->
@@ -92,9 +93,9 @@
   <h1>Representing Code</h1>
 
 <div class="sign-up closable">
-    <h1>This book is a work in progress!</h1>
+  <h1>This book is a work in progress!</h1>
     <span class="dismiss">&times;</span>
-    <p>If you see a mistake, find something unclear, or have a suggestion, please <a href="https://github.com/munificent/craftinginterpreters/issues" target="_blank">let me know</a>. To learn when new chapters are up, join the mailing list:</p>
+    <p>If you see a mistake, find something unclear, or have a suggestion, please <a href="https://github.com/munificent/craftinginterpreters/issues" target="_blank">let me know</a>. To follow its progress, please join the mailing list:</p>
 
   <!-- Begin MailChimp Signup Form -->
   <div id="mc_embed_signup">
@@ -112,7 +113,7 @@
 <blockquote>
 <p>To dwellers in a wood, almost every species of tree has its voice as well as
 its feature.
-<cite>Thomas Hardy</cite></p>
+<cite>Thomas Hardy, <em>Under the Greenwood Tree</em></cite></p>
 </blockquote>
 <p>In the <a href="scanning.html">last chapter</a>, we took the raw source code as a string and
 transformed it into a slightly higher-level representation: a series of tokens.
@@ -136,9 +137,11 @@ you manually evaluate an arithmetic expression like this:</p>
 </pre></div>
 
 
-<p>Because you understand the rules of precedence<span class="em">&mdash;</span>the old &ldquo;Please Excuse My Dear
-Aunt Sally&rdquo; stuff<span class="em">&mdash;</span>you know that the <code>*</code> is evaluated before the <code>+</code> or <code>-</code>.
-One way to visualize that precedence is using a tree. Leaf nodes are numbers, and interior nodes are operators with branches for each of their operands.</p>
+<p>Because you understand the order of operations<span class="em">&mdash;</span>the old &ldquo;<a href="https://en.wikipedia.org/wiki/Order_of_operations#Mnemonics">Please Excuse My
+Dear Aunt Sally</a>&rdquo; stuff<span class="em">&mdash;</span>you know that the <code>*</code> is evaluated before the
+<code>+</code> or <code>-</code>. One way to visualize that precedence is using a tree. Leaf nodes are
+numbers, and interior nodes are operators with branches for each of their
+operands.</p>
 <p>In order to evaluate an arithmetic node, you need to know the numeric values of
 its subtrees, so you have to evaluate those first. That means working your way
 from the leaves up to the root<span class="em">&mdash;</span>a <em>post-order</em> traversal:</p>
@@ -276,22 +279,24 @@ languages all the way down!</p>
 <p>Yes, I really am going to be using breakfast examples throughout this entire
 book. Sorry.</p>
 </aside>
-<div class="codehilite"><pre><span></span><span class="n">breakfast</span> <span class="err">→</span> <span class="n">protein</span> <span class="s">&quot;with&quot;</span> <span class="n">bread</span> <span class="p">;</span>
-<span class="n">breakfast</span> <span class="err">→</span> <span class="n">protein</span> <span class="p">;</span>
-<span class="n">breakfast</span> <span class="err">→</span> <span class="n">bread</span> <span class="p">;</span>
+<div class="codehilite"><pre><span></span><span class="n">breakfast</span>  <span class="err">→</span> <span class="n">protein</span> <span class="s">&quot;with&quot;</span> <span class="n">breakfast</span> <span class="s">&quot;on the side&quot;</span> <span class="p">;</span>
+<span class="n">breakfast</span>  <span class="err">→</span> <span class="n">protein</span> <span class="p">;</span>
+<span class="n">breakfast</span>  <span class="err">→</span> <span class="n">bread</span> <span class="p">;</span>
 
-<span class="n">protein</span>   <span class="err">→</span> <span class="n">protein</span> <span class="s">&quot;and&quot;</span> <span class="n">protein</span> <span class="p">;</span>
-<span class="n">protein</span>   <span class="err">→</span> <span class="s">&quot;bacon&quot;</span> <span class="p">;</span>
-<span class="n">protein</span>   <span class="err">→</span> <span class="s">&quot;sausage&quot;</span> <span class="p">;</span>
-<span class="n">protein</span>   <span class="err">→</span> <span class="n">cooked</span> <span class="s">&quot;eggs&quot;</span> <span class="p">;</span>
+<span class="n">protein</span>    <span class="err">→</span> <span class="n">crispiness</span> <span class="s">&quot;crispy&quot;</span> <span class="s">&quot;bacon&quot;</span> <span class="p">;</span>
+<span class="n">protein</span>    <span class="err">→</span> <span class="s">&quot;sausage&quot;</span> <span class="p">;</span>
+<span class="n">protein</span>    <span class="err">→</span> <span class="n">cooked</span> <span class="s">&quot;eggs&quot;</span> <span class="p">;</span>
 
-<span class="n">cooked</span>    <span class="err">→</span> <span class="s">&quot;scrambled&quot;</span> <span class="p">;</span>
-<span class="n">cooked</span>    <span class="err">→</span> <span class="s">&quot;poached&quot;</span> <span class="p">;</span>
-<span class="n">cooked</span>    <span class="err">→</span> <span class="s">&quot;fried&quot;</span> <span class="p">;</span>
+<span class="n">crispiness</span> <span class="err">→</span> <span class="s">&quot;really&quot;</span> <span class="p">;</span>
+<span class="n">crispiness</span> <span class="err">→</span> <span class="s">&quot;really&quot;</span> <span class="n">crispiness</span> <span class="p">;</span>
 
-<span class="n">bread</span>     <span class="err">→</span> <span class="s">&quot;toast&quot;</span> <span class="p">;</span>
-<span class="n">bread</span>     <span class="err">→</span> <span class="s">&quot;biscuits&quot;</span> <span class="p">;</span>
-<span class="n">bread</span>     <span class="err">→</span> <span class="s">&quot;English muffin&quot;</span> <span class="p">;</span>
+<span class="n">cooked</span>     <span class="err">→</span> <span class="s">&quot;scrambled&quot;</span> <span class="p">;</span>
+<span class="n">cooked</span>     <span class="err">→</span> <span class="s">&quot;poached&quot;</span> <span class="p">;</span>
+<span class="n">cooked</span>     <span class="err">→</span> <span class="s">&quot;fried&quot;</span> <span class="p">;</span>
+
+<span class="n">bread</span>      <span class="err">→</span> <span class="s">&quot;toast&quot;</span> <span class="p">;</span>
+<span class="n">bread</span>      <span class="err">→</span> <span class="s">&quot;biscuits&quot;</span> <span class="p">;</span>
+<span class="n">bread</span>      <span class="err">→</span> <span class="s">&quot;English muffin&quot;</span> <span class="p">;</span>
 </pre></div>
 
 
@@ -299,38 +304,44 @@ book. Sorry.</p>
 see how it works. By age-old convention, the game starts with the first rule in
 the grammar, here <code>breakfast</code>. There are three productions for that, and we
 randomly pick the first one. Our resulting string looks like:</p>
-<div class="codehilite"><pre><span></span>protein &quot;with&quot; bread
+<div class="codehilite"><pre><span></span>protein &quot;with&quot; breakfast &quot;on the side&quot;
 </pre></div>
 
 
 <p>We need to expand that first nonterminal, <code>protein</code>, so we pick a production for
 that. Let&rsquo;s pick:</p>
-<div class="codehilite"><pre><span></span><span class="n">protein</span> <span class="err">→</span> <span class="n">protein</span> <span class="s">&quot;and&quot;</span> <span class="n">protein</span> <span class="p">;</span>
-</pre></div>
-
-
-<p>Note that the production refers to its own rule. This is the key difference
-between context-free and regular languages. The former are allowed to recurse.
-It is exactly this that lets them nest and compose.</p>
-<p>We could keep picking the first production for <code>protein</code> over and over again
-yielding all manner of breakfasts like &ldquo;bacon and sausage and sausage and bacon
-and&hellip;&rdquo;. We won&rsquo;t though. We need to again pick a production for <code>protein</code> in
-the inner reference to <code>protein "and" protein</code>. This time we&rsquo;ll pick <code>"bacon"</code>.
-We finally hit a terminal, so we set that as the first word in the resulting
-string.</p>
-<p>Now we pop back out to the first <code>protein "and" protein</code>. The next symbol is
-<code>"and"</code>, a terminal, so we add that. Then we hit another <code>protein</code>. This
-time, we pick:</p>
 <div class="codehilite"><pre><span></span><span class="n">protein</span> <span class="err">→</span> <span class="n">cooked</span> <span class="s">&quot;eggs&quot;</span> <span class="p">;</span>
 </pre></div>
 
 
-<p>We need a production for <code>cooked</code> and pick <code>"poached"</code>. That&rsquo;s a terminal, so
-we add that. Now we&rsquo;re back to the <code>protein</code>, so we add <code>"eggs"</code>. We bounce back
-to <code>breakfast</code> and add <code>"with"</code>. Now all that&rsquo;s left is to pick a production for
-<code>bread</code>. We&rsquo;ll pick <code>"English muffin"</code>. That&rsquo;s again a terminal, so we add
-that and we&rsquo;re done:</p>
+<p>Next, we need a production for <code>cooked</code>, and so we pick <code>"poached"</code>. That&rsquo;s a
+terminal, so we add that. Now our string looks like:</p>
+<div class="codehilite"><pre><span></span>&quot;poached&quot; &quot;eggs&quot; &quot;with&quot; breakfast &quot;on the side&quot;
+</pre></div>
+
+
+<p>The next non-terminal is <code>breakfast</code> again. The first <code>breakfast</code> production we
+chose recursively refers back to the <code>breakfast</code> rule. Recursion like this
+usually indicates that the language is context-free instead of regular. In
+particular, this kind of nested recursion where the recursive nonterminal has
+productions on <span name="nest">both</span> sides of it means that it&rsquo;s not
+regular.</p>
+<aside name="nest">
+<p>Imagine that we&rsquo;ve recursively expanded the <code>breakfast</code> rule here several times,
+like &ldquo;bacon with bacon with bacon with bacon &hellip;&rdquo;. In order to complete the
+string, we&rsquo;ll need to add an equivalent number of &ldquo;on the side&rdquo; bits to the end.
+Keeping track of that number of trailing parts is beyond the capabilities of a
+simple regular grammar. A regular grammar can <em>repeat</em>, but it can&rsquo;t <em>count</em>.</p>
+</aside>
+<p>We could keep picking the first production for <code>breakfast</code> over and over again
+yielding all manner of breakfasts like &ldquo;bacon with sausage with scrambled eggs
+with bacon &hellip;&rdquo;. We won&rsquo;t though. This time we&rsquo;ll pick <code>bread</code>. There are three
+rules for that, each of which contains only a terminal. We&rsquo;ll pick &ldquo;English
+muffin&rdquo;.</p>
+<p>With that, every nonterminal in the string has been expanded until it finally
+contains only terminals and we&rsquo;re left with:</p>
 <p><img src="image/representing-code/breakfast.png" alt='"Playing" the grammar to generate a string.' /></p>
+<p>Throw in some ham and Hollandaise, and you&rsquo;ve got eggs Benedict.</p>
 <p>Any time we hit a rule that had multiple productions, we just picked one
 arbitrarily. It is this flexibility that allows a short number of grammar rules
 to encode a combinatorially larger set of strings. The fact that a rule can
@@ -338,7 +349,7 @@ refer to itself<span class="em">&mdash;</span>directly or indirectly<span class=
 pack an infinite number of strings into a finite grammar.</p>
 <h3><a href="#enhancing-our-notation" name="enhancing-our-notation"><small>5&#8202;.&#8202;1&#8202;.&#8202;2</small> Enhancing our notation</a></h3>
 <p>Stuffing an infinite set of strings in a handful of rules is pretty fantastic,
-but let&rsquo;s take it farther. Our notation works, but it&rsquo;s a little tedious. So,
+but let&rsquo;s take it further. Our notation works, but it&rsquo;s a little tedious. So,
 like any good language designer, we&rsquo;ll sprinkle some syntactic sugar on top. In
 addition to terminals and nonterminals, we&rsquo;ll allow a few other kinds of
 expressions in the body of a rule:</p>
@@ -365,7 +376,7 @@ expressions in the body of a rule:</p>
     it&rsquo;s kind of a chore to make a separate named sub-rule each time we want to
     loop. Instead, we allow a postfix <code>*</code> to mean the previous symbol or group
     may be repeated zero or more times.</p>
-<div class="codehilite"><pre><span></span><span class="n">protein</span> <span class="err">→</span> <span class="n">protein</span> <span class="p">(</span> <span class="s">&quot;and&quot;</span> <span class="n">protein</span> <span class="p">)</span><span class="o">*</span> <span class="p">;</span>
+<div class="codehilite"><pre><span></span><span class="n">crispiness</span> <span class="err">→</span> <span class="s">&quot;really&quot;</span> <span class="s">&quot;really&quot;</span><span class="o">*</span> <span class="p">;</span>
 </pre></div>
 
 
@@ -380,21 +391,25 @@ recursion.</p>
 <li>
 <p>A postfix <code>+</code> is similar, but requires the preceding production to appear
     at least once.</p>
+<div class="codehilite"><pre><span></span><span class="n">crispiness</span> <span class="err">→</span> <span class="s">&quot;really&quot;</span><span class="o">+</span> <span class="p">;</span>
+</pre></div>
+
+
 </li>
 <li>
 <p>A postfix <code>?</code> is for an optional production. The thing before it can appear
     zero or one time, but not more.</p>
-<div class="codehilite"><pre><span></span><span class="n">breakfast</span> <span class="err">→</span> <span class="n">protein</span> <span class="p">(</span> <span class="s">&quot;with&quot;</span> <span class="n">bread</span> <span class="p">)</span><span class="err">?</span> <span class="p">;</span>
+<div class="codehilite"><pre><span></span><span class="n">breakfast</span> <span class="err">→</span> <span class="n">protein</span> <span class="p">(</span> <span class="s">&quot;with&quot;</span> <span class="n">breakfast</span> <span class="s">&quot;on the side&quot;</span> <span class="p">)</span><span class="err">?</span> <span class="p">;</span>
 </pre></div>
 
 
 </li>
 </ul>
 <p>With all of that sugar, our breakfast grammar condenses down to:</p>
-<div class="codehilite"><pre><span></span><span class="n">breakfast</span> <span class="err">→</span> <span class="n">protein</span> <span class="p">(</span> <span class="s">&quot;and&quot;</span> <span class="n">protein</span> <span class="p">)</span><span class="o">*</span> <span class="p">(</span> <span class="s">&quot;with&quot;</span> <span class="n">bread</span> <span class="p">)</span><span class="err">?</span>
+<div class="codehilite"><pre><span></span><span class="n">breakfast</span> <span class="err">→</span> <span class="n">protein</span> <span class="p">(</span> <span class="s">&quot;with&quot;</span> <span class="n">breakfast</span> <span class="s">&quot;on the side&quot;</span> <span class="p">)</span><span class="err">?</span>
           <span class="err">|</span> <span class="n">bread</span> <span class="p">;</span>
 
-<span class="n">protein</span>   <span class="err">→</span> <span class="s">&quot;bacon&quot;</span>
+<span class="n">protein</span>   <span class="err">→</span> <span class="s">&quot;really&quot;</span><span class="o">+</span> <span class="s">&quot;crispy&quot;</span> <span class="s">&quot;bacon&quot;</span>
           <span class="err">|</span> <span class="s">&quot;sausage&quot;</span>
           <span class="err">|</span> <span class="p">(</span> <span class="s">&quot;scrambled&quot;</span> <span class="err">|</span> <span class="s">&quot;poached&quot;</span> <span class="err">|</span> <span class="s">&quot;fried&quot;</span> <span class="p">)</span> <span class="s">&quot;eggs&quot;</span> <span class="p">;</span>
 
@@ -486,12 +501,12 @@ AST elides productions that aren&rsquo;t needed by later phases.</p>
 <p>Our scanner used a single Token class to represent all kinds of lexemes. To
 distinguish the different kinds<span class="em">&mdash;</span>think the number <code>123</code> versus the string
 <code>"123"</code><span class="em">&mdash;</span>we included a simple TokenType enum.</p>
-<p>Syntax trees are not so <span name="token-data">homogenous</span>. Unary
+<p>Syntax trees are not so <span name="token-data">homogeneous</span>. Unary
 expressions have a single operand, binary expressions have two, and literals
 have none. We <em>could</em> mush that all together into a single Expression class with
 an arbitrary list of children. Some compilers do.</p>
 <aside name="token-data">
-<p>Tokens aren&rsquo;t entirely homogenous either. Tokens for literals store the value
+<p>Tokens aren&rsquo;t entirely homogeneous either. Tokens for literals store the value
 but other kinds of lexemes don&rsquo;t need that state. I have seen scanners that use
 different classes for literals and other kinds of lexemes, but I figured I&rsquo;d
 keep things simpler.</p>
@@ -504,7 +519,7 @@ access the second operand of a unary expression.</p>
 <p>Something like:</p>
 <div class="codehilite"><pre><span></span><span class="kn">package</span> <span class="nn">com.craftinginterpreters.lox</span><span class="o">;</span>
 
-<span class="kd">abstract</span> <span class="kd">class</span> <span class="nc">Expr</span> <span class="o">{</span> <span name="expr"></span>
+<span class="kd">abstract</span> <span class="kd">class</span> <span class="nc">Expr</span> <span class="o">{</span><span name="expr"> </span>
   <span class="kd">static</span> <span class="kd">class</span> <span class="nc">Binary</span> <span class="kd">extends</span> <span class="n">Expr</span> <span class="o">{</span>
     <span class="n">Binary</span><span class="o">(</span><span class="n">Expr</span> <span class="n">left</span><span class="o">,</span> <span class="n">Token</span> <span class="n">operator</span><span class="o">,</span> <span class="n">Expr</span> <span class="n">right</span><span class="o">)</span> <span class="o">{</span>
       <span class="k">this</span><span class="o">.</span><span class="na">left</span> <span class="o">=</span> <span class="n">left</span><span class="o">;</span>
@@ -655,7 +670,7 @@ in <em>defineAst</em>()</div>
 <pre class="insert"><span></span>    <span class="c1">// The AST classes.                                     </span>
     <span class="k">for</span> <span class="o">(</span><span class="n">String</span> <span class="n">type</span> <span class="o">:</span> <span class="n">types</span><span class="o">)</span> <span class="o">{</span>                             
       <span class="n">String</span> <span class="n">className</span> <span class="o">=</span> <span class="n">type</span><span class="o">.</span><span class="na">split</span><span class="o">(</span><span class="s">&quot;:&quot;</span><span class="o">)[</span><span class="mi">0</span><span class="o">].</span><span class="na">trim</span><span class="o">();</span>         
-      <span class="n">String</span> <span class="n">fields</span> <span class="o">=</span> <span class="n">type</span><span class="o">.</span><span class="na">split</span><span class="o">(</span><span class="s">&quot;:&quot;</span><span class="o">)[</span><span class="mi">1</span><span class="o">].</span><span class="na">trim</span><span class="o">();</span> <span name="robust"></span>
+      <span class="n">String</span> <span class="n">fields</span> <span class="o">=</span> <span class="n">type</span><span class="o">.</span><span class="na">split</span><span class="o">(</span><span class="s">&quot;:&quot;</span><span class="o">)[</span><span class="mi">1</span><span class="o">].</span><span class="na">trim</span><span class="o">();</span><span name="robust"> </span>
       <span class="n">defineType</span><span class="o">(</span><span class="n">writer</span><span class="o">,</span> <span class="n">baseName</span><span class="o">,</span> <span class="n">className</span><span class="o">,</span> <span class="n">fields</span><span class="o">);</span>      
     <span class="o">}</span>                                                       
 </pre><pre class="insert-after"><span></span>    <span class="n">writer</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;}&quot;</span><span class="o">);</span>                                    
@@ -725,9 +740,10 @@ trees, just a separate Java class for each one.</p>
 </pre></div>
 
 
-<p>That&rsquo;s verbose and slow. Also, the Java compiler won&rsquo;t tell us when we forget to
-add support for some new expression class. With an enum, we get a compile
-error when a switch is missing a case.</p>
+<p>But all of those sequential type tests are slow. Expression types whose names
+are alphabetically later would take longer to execute because they&rsquo;d fall
+through more if cases before finding the right type. That&rsquo;s not my idea of an
+elegant solution.</p>
 <p>We have a family of classes and we need to associate a chunk of behavior with
 each one. The natural solution in an object-oriented language like Java is to
 put that behavior into methods on the classes themselves. We could add an
@@ -784,9 +800,9 @@ types. A functional language instead encourages you to lump each column&rsquo;s 
 of code together into <em>functions</em>.</p>
 <p>A bunch of smart language nerds noticed that neither style made it easy to add
 <em>both</em> rows and columns to the <span name="multi">table</span>. They called this
-the &ldquo;expression problem&rdquo; because<span class="em">&mdash;</span>like we are here<span class="em">&mdash;</span>the example problem they
-used was about expression types in an interpreter, but also because it relates
-to how &ldquo;expressive&rdquo; a language is.</p>
+difficulty the &ldquo;expression problem&rdquo; because<span class="em">&mdash;</span>like we are now<span class="em">&mdash;</span>they first ran
+into it when they were trying to figure out the best way to model expression
+syntax tree nodes in a compiler.</p>
 <aside name="multi">
 <p>Languages with <em>multimethods</em>, like Common Lisp&rsquo;s CLOS, Dylan, and Julia do
 support adding both new types and operations easily. What they typically
@@ -841,7 +857,7 @@ previous night&rsquo;s revelry.</p>
 them, decorating them, etc.<span class="em">&mdash;</span>without having to add a new method to each class
 every time. Here&rsquo;s how we do it. First, we define a separate interface:</p>
 <div class="codehilite"><pre><span></span>  <span class="kd">interface</span> <span class="nc">PastryVisitor</span> <span class="o">{</span>                          
-    <span class="kt">void</span> <span class="nf">visitBeignet</span><span class="o">(</span><span class="n">Beignet</span> <span class="n">beignet</span><span class="o">);</span> <span name="overload"></span>
+    <span class="kt">void</span> <span class="nf">visitBeignet</span><span class="o">(</span><span class="n">Beignet</span> <span class="n">beignet</span><span class="o">);</span><span name="overload"> </span>
     <span class="kt">void</span> <span class="nf">visitCruller</span><span class="o">(</span><span class="n">Cruller</span> <span class="n">cruller</span><span class="o">);</span>              
   <span class="o">}</span>                                                  
 </pre></div>
@@ -901,8 +917,8 @@ a clever pattern.</p>
 name="context">refine</span> the pattern a little. In the pastry example, the
 visit and <code>accept()</code> methods don&rsquo;t return anything. In practice, visitors often
 want to define operations that produce values. But what return type should
-<code>accept()</code> have? We can&rsquo;t assume every visitor wants to produce the same type,
-so we&rsquo;ll use generics to let each one pick.</p>
+<code>accept()</code> have? We can&rsquo;t assume every visitor class wants to produce the same
+type, so we&rsquo;ll use generics to let each implementation fill in a return type.</p>
 <aside name="context">
 <p>Another common refinement is an additional &ldquo;context&rdquo; parameter that is passed to
 the visit methods and then sent back through as a parameter to <code>accept()</code>. That
@@ -962,6 +978,7 @@ own type:</p>
 in <em>defineType</em>()</div>
 <pre class="insert"><br><span></span>    <span class="c1">// Visitor pattern.                                      </span>
     <span class="n">writer</span><span class="o">.</span><span class="na">println</span><span class="o">();</span>                                        
+    <span class="n">writer</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;    @Override&quot;</span><span class="o">);</span>                         
     <span class="n">writer</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;    &lt;R&gt; R accept(Visitor&lt;R&gt; visitor) {&quot;</span><span class="o">);</span>
     <span class="n">writer</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;      return visitor.visit&quot;</span> <span class="o">+</span>            
         <span class="n">className</span> <span class="o">+</span> <span class="n">baseName</span> <span class="o">+</span> <span class="s">&quot;(this);&quot;</span><span class="o">);</span>                   
@@ -1114,9 +1131,9 @@ when we start parsing Lox code into syntax trees.</p>
 <li>
 <p>Earlier, I said that the <code>|</code>, <code>*</code>, and <code>+</code> forms we added to our grammar
     metasyntax were just syntactic sugar. Given this grammar:</p>
-<div class="codehilite"><pre><span></span>expr → expr ( &quot;(&quot; ( expr ( &quot;,&quot; expr )* )? &quot;)&quot; | &quot;.&quot; IDENTIFIER )*
-     | IDENTIFIER
-     | NUMBER
+<div class="codehilite"><pre><span></span><span class="n">expr</span> <span class="err">→</span> <span class="n">expr</span> <span class="p">(</span> <span class="s">&quot;(&quot;</span> <span class="p">(</span> <span class="n">expr</span> <span class="p">(</span> <span class="s">&quot;,&quot;</span> <span class="n">expr</span> <span class="p">)</span><span class="o">*</span> <span class="p">)</span><span class="err">?</span> <span class="s">&quot;)&quot;</span> <span class="err">|</span> <span class="s">&quot;.&quot;</span> <span class="vg">IDENTIFIER</span> <span class="p">)</span><span class="o">*</span>
+     <span class="err">|</span> <span class="vg">IDENTIFIER</span>
+     <span class="err">|</span> <span class="vg">NUMBER</span>
 </pre></div>
 
 
@@ -1157,7 +1174,7 @@ converts it to RPN, and returns the resulting string.</p>
 <a href="parsing-expressions.html" class="next">
   Next Chapter: &ldquo;Parsing Expressions&rdquo; &rarr;
 </a>
-Hand-crafted by Robert Nystrom&ensp;&mdash;&ensp;<a href="https://github.com/munificent/craftinginterpreters/blob/master/LICENSE" target="_blank">&copy; 2015&hairsp;&ndash;&hairsp;2018</a>
+Hand-crafted by Robert Nystrom&ensp;&mdash;&ensp;<a href="https://github.com/munificent/craftinginterpreters/blob/master/LICENSE" target="_blank">&copy; 2015&hairsp;&ndash;&hairsp;2020</a>
 </footer>
 </article>
 

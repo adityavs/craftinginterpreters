@@ -2,9 +2,9 @@
 #ifndef clox_compiler_h
 #define clox_compiler_h
 
-//> Strings not-yet
+//> Strings compiler-include-object
 #include "object.h"
-//< Strings not-yet
+//< Strings compiler-include-object
 //> Compiling Expressions compile-h
 #include "vm.h"
 
@@ -12,14 +12,14 @@
 /* Scanning on Demand compiler-h < Compiling Expressions compile-h
 void compile(const char* source);
 */
-/* Compiling Expressions compile-h < Calls and Functions not-yet
+/* Compiling Expressions compile-h < Calls and Functions compile-h
 bool compile(const char* source, Chunk* chunk);
 */
-//> Calls and Functions not-yet
+//> Calls and Functions compile-h
 ObjFunction* compile(const char* source);
-//< Calls and Functions not-yet
-//> Garbage Collection not-yet
-void grayCompilerRoots();
-//< Garbage Collection not-yet
+//< Calls and Functions compile-h
+//> Garbage Collection mark-compiler-roots-h
+void markCompilerRoots();
+//< Garbage Collection mark-compiler-roots-h
 
 #endif

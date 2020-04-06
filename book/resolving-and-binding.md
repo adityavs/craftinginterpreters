@@ -6,7 +6,7 @@
 > it, you are suddenly astonished and ask yourself how in the world it all came
 > about.
 >
-> <cite>Thor Heyerdahl</cite>
+> <cite>Thor Heyerdahl, <em>Kon-Tiki</em></cite>
 
 Oh, no! Our language implementation is taking on water! Way back when we [added
 variables and blocks][statements], we had scoping nice and tight. But when we
@@ -163,7 +163,7 @@ that implies the second call to `showA()` should print the same thing.
 
 Alas, it prints:
 
-```
+```text
 global
 block
 ```
@@ -292,7 +292,7 @@ previously-declared variables along with the one new name. Declaring a variable
 would do the implicit "split" where you have an environment before the variable
 is declared and one after:
 
-<img src="image/resolving-and-binding/split.png" alt="Seperate environments before and after the variable is declared." />
+<img src="image/resolving-and-binding/split.png" alt="Separate environments before and after the variable is declared." />
 
 A closure retains a reference to the Environment instance in play when the
 function was declared. Since any later declarations in that block would produce
@@ -387,8 +387,8 @@ execution:
 
 <aside name="fix">
 
-Variable resolution touches each node once, so its performance is `O(n)` where
-`n` is the number of syntax tree nodes. More sophisticated analyses may have
+Variable resolution touches each node once, so its performance is *O(n)* where
+*n* is the number of syntax tree nodes. More sophisticated analyses may have
 greater complexity, but most are carefully designed to be linear or not far from
 it. It's an embarrassing faux pas if your compiler gets exponentially slower as
 the user's program grows.
@@ -444,9 +444,9 @@ like so:
 
 ^code begin-scope
 
-Lexical scopes nest and in both the interpreter and the resolver. They behave
-like a stack. The interpreter implements that stack using a linked list -- the
-chain of Environment objects. In the resolver, we use an actual Java Stack:
+Lexical scopes nest in both the interpreter and the resolver. They behave like a
+stack. The interpreter implements that stack using a linked list -- the chain of
+Environment objects. In the resolver, we use an actual Java Stack:
 
 ^code scopes-field (1 before, 2 after)
 
@@ -707,10 +707,10 @@ variable or assignment expression is later executed, but where? One obvious
 place is right in the syntax tree node itself. That's a fine approach, and
 that's where many compilers store the results of analyses like this.
 
-We could do that, but it would require mucking around with our syntax tree
-generator. Instead, we'll take another common approach and store it off to the
-<span name="side">side</span> in a map that associates each syntax tree node
-with its resolved data:
+We could do that, but it would require <span name="side">mucking</span> around
+with our syntax tree generator. Instead, we'll take another common approach and
+store it off to the side in a map that associates each syntax tree node with its
+resolved data:
 
 <aside name="side">
 

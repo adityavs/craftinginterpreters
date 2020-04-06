@@ -91,9 +91,9 @@ indebted to Lua's clean, efficient implementation.
 
 Now that JavaScript has taken over the world and is used to build ginormous
 applications, it's hard to think of it as a "little scripting language". But
-Brendan Eich hacked it into Netscape in *ten days* to make buttons animate on
-web pages. JavaScript has grown up since then, but it was once a cute little
-language.
+Brendan Eich hacked it into Netscape Navigator in *ten days* to make buttons
+animate on web pages. JavaScript has grown up since then, but it was once a
+cute little language.
 
 Because Eich slapped JS together with roughly the same raw materials and time as
 an episode of MacGyver, it has some weird semantic corners where the duct tape
@@ -151,7 +151,7 @@ retain calls if you squint.
 
 For lots more on this, see "[A Unified Theory of Garbage Collection][gc]" (PDF).
 
-[gc]: http://www.cs.virginia.edu/~cs415/reading/bacon-garbage.pdf
+[gc]: https://researcher.watson.ibm.com/researcher/files/us-bacon/Bacon04Unified.pdf
 
 </aside>
 
@@ -377,14 +377,15 @@ typical operator menagerie out of our little language. No bitwise, shift,
 modulo, or conditional operators. I'm not grading you, but you will get bonus
 points in my heart if you augment your own implementation of Lox with them.
 
+Those are the expression forms (except for a couple related to specific features
+that we'll get to later), so let's move up a level.
+
 ## Statements
 
-Those are the expression forms (except for a couple related to specific features
-that we'll get to later), so let's move up a level. Now we're at statements.
-Where an expression's main job is to produce a *value*, a statement's job is to
-produce an *effect*. Since, by definition, statements don't evaluate to a value,
-to be useful they have to otherwise change the world in some way -- usually
-modifying some state, reading input, or producing output.
+Now we're at statements. Where an expression's main job is to produce a *value*,
+a statement's job is to produce an *effect*. Since, by definition, statements
+don't evaluate to a value, to be useful they have to otherwise change the world
+in some way -- usually modifying some state, reading input, or producing output.
 
 You've seen a couple of kinds of statements already. The first one was:
 
@@ -574,13 +575,13 @@ Now's a good time to clarify some terminology. Some people throw around
 We're going to spend a lot of time splitting the finest of downy hairs around
 semantics, so let's sharpen our words. From here on out:
 
-* An **argument** is an actual value you pass to a function when you call it.
-  So a function *call* has an *argument* list. Sometimes you hear "actual
-  parameter" used for these.
+*   An **argument** is an actual value you pass to a function when you call it.
+    So a function *call* has an *argument* list. Sometimes you hear **"actual
+    parameter"** used for these.
 
-* A **parameter** is a variable that holds the value of the argument inside the
-  body of the function. Thus, a function *declaration* has a *parameter* list.
-  Others call these **"formal parameters"** or simply **"formals"**.
+*   A **parameter** is a variable that holds the value of the argument inside
+    the body of the function. Thus, a function *declaration* has a *parameter*
+    list. Others call these **"formal parameters"** or simply **"formals"**.
 
 The body of a function is always a block. Inside it, you can return a value
 using a `return` statement:
@@ -662,8 +663,10 @@ doesn't happen to close over any variables.
 <aside name="closure">
 
 Peter J. Landin coined the term. Yes, he coined damn near half the terms in
-programming languages. Most of them came out of one incredible paper, "The Next
-700 Programming Languages".
+programming languages. Most of them came out of one incredible paper, "[The Next
+700 Programming Languages][svh]".
+
+[svh]: https://homepages.inf.ed.ac.uk/wadler/papers/papers-we-love/landin-next-700.pdf
 
 In order to implement these kind of functions, you need to create a data
 structure that bundles together the function's code, and the surrounding
@@ -733,17 +736,25 @@ accidentally took over the world.
 [classes]: https://en.wikipedia.org/wiki/Class-based_programming
 [prototypes]: https://en.wikipedia.org/wiki/Prototype-based_programming
 
-The line between the two gets <span name="blurry">blurry</span> once you look at
-the details of languages on both sides, but the basic idea is that in
-prototypes, you don't need to have some "class"-like construct that represents a
-"kind of thing". Methods can exist right on an individual object and objects can
-inherit from ("delegate to" in prototypal lingo) each other.
+In a class-based language, there are two core concepts: instances and classes.
+Instances store the state for each object and have a reference to the instance's
+class. Classes contain the methods and inheritance chain. To call a method on an
+instance, there is always a level of indirection. You look up the instance's
+class and then you find the method *there*:
+
+<img src="image/the-lox-language/class-lookup.png" alt="How fields and methods are looked up on classes and instances" />
+
+Prototype-based languages <span name="blurry">merge</span> these two concepts.
+There are only objects -- no classes -- and each individual object may contain
+state and methods. Objects can directly inherit from each other (or "delegate
+to" in prototypal lingo):
 
 <aside name="blurry">
 
-I say it's blurry because JavaScript's "constructor function" notion [pushes you
-pretty hard][js new] towards defining class-like objects. Meanwhile, class-based
-Ruby is perfectly happy to let you attach methods to individual instances.
+In practice the line between class-based and prototype-based languages blurs.
+JavaScript's "constructor function" notion [pushes you pretty hard][js new]
+towards defining class-like objects. Meanwhile, class-based Ruby is perfectly
+happy to let you attach methods to individual instances.
 
 [js new]: http://gameprogrammingpatterns.com/prototype.html#what-about-javascript
 
@@ -751,14 +762,8 @@ Ruby is perfectly happy to let you attach methods to individual instances.
 
 <img src="image/the-lox-language/prototype-lookup.png" alt="How fields and methods are looked up in a prototypal system" />
 
-With classes, state is on the instance, but for methods, there is always a level
-of indirection. When you call a method, you look up the object's class and then
-you find the method *there*.
-
-<img src="image/the-lox-language/class-lookup.png" alt="How fields and methods are looked up on classes and instances" />
-
 This means prototypal languages are more fundamental in some way than classes.
-They are really neat to implement because they're so simple. Also, they can
+They are really neat to implement because they're *so* simple. Also, they can
 express lots of unusual patterns that classes steer you away from.
 
 But I've looked at a *lot* of code written in prototypal languages -- including
@@ -894,7 +899,7 @@ When you declare a class, you can specify a class that it inherits from using
 ```lox
 class Brunch < Breakfast {
   drink() {
-    print "How about a Blood Mary?";
+    print "How about a Bloody Mary?";
   }
 }
 ```

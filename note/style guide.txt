@@ -6,7 +6,8 @@ bold the quotes too. (This looks a little better, but also putting the bold
 inside the quotes confuses smartypants.)
 
 References to statements like "if statement" or "switch" are not code-formatted.
-References to the *keywords* used by those statements are.
+References to the *keywords* used by those statements are. Exception: `var`
+statements.
 
 When referring to the Boolean values true and false, put them in code font, as
 in "returns `true`". Use normal text when referring to truth or falsehood in
@@ -24,6 +25,8 @@ Figuring out when to use "we" versus "it" when talking about the code is hard.
 It's important to be clear because the prose talks about what the reader needs
 to do "define this method", "replace this line", etc. and what the code needs
 to do while it's running "match this token", etc.
+
+TODO: How do we style keywords used in headers and subheaders?
 
 But it gets really awkward to always use "it" for describing what the code does.
 So the rough rules are:
@@ -43,7 +46,18 @@ File names and extensions are quoted:
 
 > The file "Expr.java" has extension ".java".
 
-Opcodes are in code font, `OP_RETURN`. Class names are not, PrettyPrinter.
+C module names are quoted:
+
+> The "debug" module.
+
+Opcodes are in code font, `OP_RETURN`. Class names are not, PrettyPrinter. Type
+names in C are also formatted normally: Value, Obj, etc. Even built-in types
+like double and uint16_t.
+
+Big-O notation in code font: `O(n)`.
+
+`nil`, `null` (Java), and `NULL` (C) in code font. Simply "null" when used as a
+verb as in "null out the field".
 
 Hyphenate "left-hand side" and "right-hand side".
 
@@ -59,6 +73,7 @@ Always hyphenate these:
 Do not hyphenate:
 
 * left recursion
+* call stack
 
 Hyphenate when preceding a noun, but not otherwise ("A first-class function is
 first class."):
@@ -74,3 +89,7 @@ Word list:
 * lookup
 * I/O
 * "null" when referring to the null byte at the end of a string
+
+Numbers in prose are usually spelled as words when there is a single word for
+them: one, eleven, etc. However, numbers that refer to binary digits are always
+0 or 1.

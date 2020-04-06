@@ -12,7 +12,7 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
   private final Stack<Map<String, Boolean>> scopes = new Stack<>();
 //< scopes-field
 //> function-type-field
-private FunctionType currentFunction = FunctionType.NONE;
+  private FunctionType currentFunction = FunctionType.NONE;
 //< function-type-field
 
   Resolver(Interpreter interpreter) {
@@ -74,8 +74,17 @@ private FunctionType currentFunction = FunctionType.NONE;
 
 //< set-current-class
     declare(stmt.name);
+    define(stmt.name);
 //> Inheritance resolve-superclass
 
+//> inherit-self
+    if (stmt.superclass != null &&
+        stmt.name.lexeme.equals(stmt.superclass.name.lexeme)) {
+      Lox.error(stmt.superclass.name,
+          "A class cannot inherit from itself.");
+    }
+
+//< inherit-self
     if (stmt.superclass != null) {
 //> set-current-subclass
       currentClass = ClassType.SUBCLASS;
@@ -83,8 +92,6 @@ private FunctionType currentFunction = FunctionType.NONE;
       resolve(stmt.superclass);
     }
 //< Inheritance resolve-superclass
-
-    define(stmt.name);
 //> Inheritance begin-super-scope
 
     if (stmt.superclass != null) {

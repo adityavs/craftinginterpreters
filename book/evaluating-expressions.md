@@ -3,7 +3,7 @@
 
 > You are my creator, but I am your master; Obey!
 >
-> <cite>Mary Shelley, Frankenstein</cite>
+> <cite>Mary Shelley, <em>Frankenstein</em></cite>
 
 If you want to properly set the mood for this chapter, try to conjure up a
 thunderstorm, one of those swirling tempests that likes to yank open shutters at
@@ -127,7 +127,7 @@ Next, we need blobs of code to implement the evaluation logic for each kind of
 expression we can parse. We could stuff those into the syntax tree classes
 directly in something like an `interpret()` method. In effect, we could tell
 each syntax tree node, "Interpret thyself." This is the Gang of Four's
-[Interpreter design pattern][]". It's a neat pattern, but like I mentioned
+[Interpreter design pattern][]. It's a neat pattern, but like I mentioned
 earlier, it gets messy if we jam all sorts of logic into the tree classes.
 
 [interpreter design pattern]: https://en.wikipedia.org/wiki/Interpreter_pattern
@@ -351,8 +351,29 @@ equality, which may be different from Java's.
 
 Fortunately, the two are pretty similar. We have to handle `nil`/`null`
 specially so that we don't throw a NullPointerException if we try to call
-`equals()` on `null`. Otherwise, we're fine. `.equals()` on Boolean, Double, and
-String have the behavior we want for Lox.
+`equals()` on `null`. Otherwise, we're fine. <span name="nan">`.equals()`</span>
+on Boolean, Double, and String have the behavior we want for Lox.
+
+<aside name="nan">
+
+What do you expect this to evaluate to:
+
+```lox
+(0 / 0) == (0 / 0)
+```
+
+According to [IEEE 754][], which specifies the behavior of double precision
+numbers, dividing a zero by zero gives you the special "NaN" ("not a number")
+value. Strangely enough, NaN is supposed to be *not* equal to itself.
+
+In Java, the `==` operator on doubles preserves that behavior, but the
+`equals()` method on Double does not. Lox uses the latter, so doesn't follow
+IEEE. These kinds of subtle incompatibilities occupy a dismaying fraction of
+language implementer's lives.
+
+[ieee 754]: https://en.wikipedia.org/wiki/IEEE_754
+
+</aside>
 
 And that's it! That's all the code we need to correctly interpret a valid Lox
 expression. But what about an *invalid* one? In particular, what happens when a
@@ -575,7 +596,7 @@ put this method there too:
 
 It uses the token associated with the RuntimeError to tell the user what line of
 code was executing when the error occurred. It would be even better to give the
-user an entire callstack to show how they *got* to be executing that code. But
+user an entire call stack to show how they *got* to be executing that code. But
 we don't have function calls yet, so I guess we don't have to worry about it.
 
 After showing the error, it sets this field:
@@ -635,7 +656,7 @@ interpreter doesn't do very much, but it's alive!
     is shorter than named function calls and might have a reasonable
     interpretation for some types like strings. Even comparisons among mixed
     types, like `3 < "pancake"` could be handy to enable things like
-    heterogenous ordered collections. Or it could lead to bugs and confused
+    heterogeneous ordered collections. Or it could lead to bugs and confused
     users.
 
     Would you extend Lox to support comparing other types? If so, which pairs of

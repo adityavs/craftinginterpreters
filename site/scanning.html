@@ -10,9 +10,10 @@
 <link rel="stylesheet" type="text/css" href="style.css" />
 
 <!-- Oh, God, Source Code Pro is so beautiful it makes me want to cry. -->
-<link href='http://fonts.googleapis.com/css?family=Source+Code+Pro:400|Source+Sans+Pro:300,400,600' rel='stylesheet' type='text/css'>
+<link href='https://fonts.googleapis.com/css?family=Source+Code+Pro:400|Source+Sans+Pro:300,400,600' rel='stylesheet' type='text/css'>
+
 <link rel="icon" type="image/png" href="image/favicon.png" />
-<script src="jquery-1.10.1.min.js"></script>
+<script src="jquery-3.4.1.min.js"></script>
 <script src="script.js"></script>
 
 <!-- Google analytics -->
@@ -102,9 +103,9 @@
   <h1>Scanning</h1>
 
 <div class="sign-up closable">
-    <h1>This book is a work in progress!</h1>
+  <h1>This book is a work in progress!</h1>
     <span class="dismiss">&times;</span>
-    <p>If you see a mistake, find something unclear, or have a suggestion, please <a href="https://github.com/munificent/craftinginterpreters/issues" target="_blank">let me know</a>. To learn when new chapters are up, join the mailing list:</p>
+    <p>If you see a mistake, find something unclear, or have a suggestion, please <a href="https://github.com/munificent/craftinginterpreters/issues" target="_blank">let me know</a>. To follow its progress, please join the mailing list:</p>
 
   <!-- Begin MailChimp Signup Form -->
   <div id="mc_embed_signup">
@@ -121,7 +122,7 @@
 
 <blockquote>
 <p>Take big bites. Anything worth doing is worth overdoing.</p>
-<p><cite>Robert A. Heinlein</cite></p>
+<p><cite>Robert A. Heinlein, <em>Time Enough for Love</em></cite></p>
 </blockquote>
 <p>The first step in any compiler or interpreter is <span
 name="lexing">scanning</span>. The scanner takes in raw source code as a series
@@ -132,7 +133,7 @@ of characters and groups it into meaningful chunks<span class="em">&mdash;</span
 analysis&rdquo;) over the years. Way back when computers were as big as Winnebagos but
 had less memory than your watch, some people used &ldquo;scanner&rdquo; only to refer to the
 piece of code that dealt with reading raw source code characters from disk and
-buffering them in memory. Then &ldquo;lexing&rdquo; was the phase after that that did useful
+buffering them in memory. Then &ldquo;lexing&rdquo; was the subsequent phase that did useful
 stuff with the characters.</p>
 <p>These days, reading a source file into memory is trivial, so it&rsquo;s rarely a
 distinct phase in the compiler. Because of that, the two terms are basically
@@ -163,7 +164,7 @@ create new file</div>
   <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span> <span class="o">{</span>
     <span class="k">if</span> <span class="o">(</span><span class="n">args</span><span class="o">.</span><span class="na">length</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="o">)</span> <span class="o">{</span>                                   
       <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;Usage: jlox [script]&quot;</span><span class="o">);</span>            
-      <span class="n">System</span><span class="o">.</span><span class="na">exit</span><span class="o">(</span><span class="mi">64</span><span class="o">);</span> <span class="c1">// [64]                               </span>
+      <span class="n">System</span><span class="o">.</span><span class="na">exit</span><span class="o">(</span><span class="mi">64</span><span class="o">);</span><span name="64"> </span>
     <span class="o">}</span> <span class="k">else</span> <span class="k">if</span> <span class="o">(</span><span class="n">args</span><span class="o">.</span><span class="na">length</span> <span class="o">==</span> <span class="mi">1</span><span class="o">)</span> <span class="o">{</span>                           
       <span class="n">runFile</span><span class="o">(</span><span class="n">args</span><span class="o">[</span><span class="mi">0</span><span class="o">]);</span>                                      
     <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>                                                 
@@ -214,7 +215,7 @@ add after <em>runFile</em>()</div>
     <span class="n">InputStreamReader</span> <span class="n">input</span> <span class="o">=</span> <span class="k">new</span> <span class="n">InputStreamReader</span><span class="o">(</span><span class="n">System</span><span class="o">.</span><span class="na">in</span><span class="o">);</span>
     <span class="n">BufferedReader</span> <span class="n">reader</span> <span class="o">=</span> <span class="k">new</span> <span class="n">BufferedReader</span><span class="o">(</span><span class="n">input</span><span class="o">);</span>
 
-    <span class="k">for</span> <span class="o">(;;)</span> <span class="o">{</span> <span class="c1">// [repl]                                       </span>
+    <span class="k">for</span> <span class="o">(;;)</span> <span class="o">{</span><span name="repl"> </span>
       <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">print</span><span class="o">(</span><span class="s">&quot;&gt; &quot;</span><span class="o">);</span>                                  
       <span class="n">run</span><span class="o">(</span><span class="n">reader</span><span class="o">.</span><span class="na">readLine</span><span class="o">());</span>                                  
     <span class="o">}</span>                                                          
@@ -445,7 +446,7 @@ create new file</div>
   <span class="kd">final</span> <span class="n">TokenType</span> <span class="n">type</span><span class="o">;</span>                                           
   <span class="kd">final</span> <span class="n">String</span> <span class="n">lexeme</span><span class="o">;</span>                                            
   <span class="kd">final</span> <span class="n">Object</span> <span class="n">literal</span><span class="o">;</span>                                           
-  <span class="kd">final</span> <span class="kt">int</span> <span class="n">line</span><span class="o">;</span> <span class="c1">// [location]                                   </span>
+  <span class="kd">final</span> <span class="kt">int</span> <span class="n">line</span><span class="o">;</span><span name="location"> </span>
 
   <span class="n">Token</span><span class="o">(</span><span class="n">TokenType</span> <span class="n">type</span><span class="o">,</span> <span class="n">String</span> <span class="n">lexeme</span><span class="o">,</span> <span class="n">Object</span> <span class="n">literal</span><span class="o">,</span> <span class="kt">int</span> <span class="n">line</span><span class="o">)</span> <span class="o">{</span>
     <span class="k">this</span><span class="o">.</span><span class="na">type</span> <span class="o">=</span> <span class="n">type</span><span class="o">;</span>                                             
@@ -524,7 +525,7 @@ create new file</div>
 <span class="kn">import</span> <span class="nn">java.util.List</span><span class="o">;</span>                                                    
 <span class="kn">import</span> <span class="nn">java.util.Map</span><span class="o">;</span>                                                     
 
-<span class="kn">import static</span> <span class="nn">com.craftinginterpreters.lox.TokenType.*</span><span class="o">;</span> <span name="static-import"></span>
+<span class="kn">import static</span> <span class="nn">com.craftinginterpreters.lox.TokenType.*</span><span class="o">;</span><span name="static-import"> </span>
 
 <span class="kd">class</span> <span class="nc">Scanner</span> <span class="o">{</span>                                                           
   <span class="kd">private</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">source</span><span class="o">;</span>                                            
@@ -613,7 +614,7 @@ add after <em>scanTokens</em>()</div>
       <span class="k">case</span> <span class="sc">&#39;-&#39;</span><span class="o">:</span> <span class="n">addToken</span><span class="o">(</span><span class="n">MINUS</span><span class="o">);</span> <span class="k">break</span><span class="o">;</span>          
       <span class="k">case</span> <span class="sc">&#39;+&#39;</span><span class="o">:</span> <span class="n">addToken</span><span class="o">(</span><span class="n">PLUS</span><span class="o">);</span> <span class="k">break</span><span class="o">;</span>           
       <span class="k">case</span> <span class="sc">&#39;;&#39;</span><span class="o">:</span> <span class="n">addToken</span><span class="o">(</span><span class="n">SEMICOLON</span><span class="o">);</span> <span class="k">break</span><span class="o">;</span>      
-      <span class="k">case</span> <span class="sc">&#39;*&#39;</span><span class="o">:</span> <span class="n">addToken</span><span class="o">(</span><span class="n">STAR</span><span class="o">);</span> <span class="k">break</span><span class="o">;</span> <span name="slash"></span>
+      <span class="k">case</span> <span class="sc">&#39;*&#39;</span><span class="o">:</span> <span class="n">addToken</span><span class="o">(</span><span class="n">STAR</span><span class="o">);</span> <span class="k">break</span><span class="o">;</span><span name="slash"> </span>
     <span class="o">}</span>                                            
   <span class="o">}</span>                                              
 </pre></div>
@@ -653,7 +654,7 @@ lexical level. What happens if a user throws a source file containing some
 characters Lox doesn&rsquo;t use, like <code>@#^</code> at our interpreter? Right now, those
 characters get silently added to the next token. That ain&rsquo;t right.</p>
 <p>Let&rsquo;s fix that:</p>
-<div class="codehilite"><pre class="insert-before"><span></span>      <span class="k">case</span> <span class="sc">&#39;*&#39;</span><span class="o">:</span> <span class="n">addToken</span><span class="o">(</span><span class="n">STAR</span><span class="o">);</span> <span class="k">break</span><span class="o">;</span> <span class="c1">// [slash]  </span>
+<div class="codehilite"><pre class="insert-before"><span></span>      <span class="k">case</span> <span class="sc">&#39;*&#39;</span><span class="o">:</span> <span class="n">addToken</span><span class="o">(</span><span class="n">STAR</span><span class="o">);</span> <span class="k">break</span><span class="o">;</span><span name="slash"> </span>
 </pre><div class="source-file"><em>lox/Scanner.java</em><br>
 in <em>scanToken</em>()</div>
 <pre class="insert"><br><span></span>      <span class="k">default</span><span class="o">:</span>                                     
@@ -685,7 +686,7 @@ operators. What about <code>!</code>? It&rsquo;s a single character, right? Some
 not when it&rsquo;s followed by a <code>=</code>. In that case, it should be a <code>!=</code> lexeme.
 Likewise, <code>&lt;</code>, <code>&gt;</code>, and <code>=</code> can all be followed by <code>=</code>.</p>
 <p>For those, we need to look at the second character:</p>
-<div class="codehilite"><pre class="insert-before"><span></span>      <span class="k">case</span> <span class="sc">&#39;*&#39;</span><span class="o">:</span> <span class="n">addToken</span><span class="o">(</span><span class="n">STAR</span><span class="o">);</span> <span class="k">break</span><span class="o">;</span> <span class="c1">// [slash]                     </span>
+<div class="codehilite"><pre class="insert-before"><span></span>      <span class="k">case</span> <span class="sc">&#39;*&#39;</span><span class="o">:</span> <span class="n">addToken</span><span class="o">(</span><span class="n">STAR</span><span class="o">);</span> <span class="k">break</span><span class="o">;</span><span name="slash"> </span>
 </pre><div class="source-file"><em>lox/Scanner.java</em><br>
 in <em>scanToken</em>()</div>
 <pre class="insert"><span></span>      <span class="k">case</span> <span class="sc">&#39;!&#39;</span><span class="o">:</span> <span class="n">addToken</span><span class="o">(</span><span class="n">match</span><span class="o">(</span><span class="sc">&#39;=&#39;</span><span class="o">)</span> <span class="o">?</span> <span class="n">BANG_EQUAL</span> <span class="o">:</span> <span class="n">BANG</span><span class="o">);</span> <span class="k">break</span><span class="o">;</span>      
@@ -848,7 +849,7 @@ newline inside a string.</p>
 <p>Finally, the last interesting bit is that when we create the token, we also
 produce the actual string <em>value</em> that will be used later by the interpreter.
 Here, that conversion only requires a <code>substring()</code> to strip off the surrounding
-quotes. If Lox supported escapes sequences like <code>\n</code>, we&rsquo;d unescape those here.</p>
+quotes. If Lox supported escape sequences like <code>\n</code>, we&rsquo;d unescape those here.</p>
 <h3><a href="#number-literals" name="number-literals"><small>4&#8202;.&#8202;6&#8202;.&#8202;2</small> Number literals</a></h3>
 <p>All numbers in Lox are floating point at runtime, but it supports both integer
 and decimal literals. A number literal is a series of <span
@@ -907,7 +908,7 @@ replace 1 line</div>
 add after <em>peek</em>()</div>
 <pre><span></span>  <span class="kd">private</span> <span class="kt">boolean</span> <span class="nf">isDigit</span><span class="o">(</span><span class="kt">char</span> <span class="n">c</span><span class="o">)</span> <span class="o">{</span>
     <span class="k">return</span> <span class="n">c</span> <span class="o">&gt;=</span> <span class="sc">&#39;0&#39;</span> <span class="o">&amp;&amp;</span> <span class="n">c</span> <span class="o">&lt;=</span> <span class="sc">&#39;9&#39;</span><span class="o">;</span>   
-  <span class="o">}</span> <span class="c1">// [is-digit]                  </span>
+  <span class="o">}</span><span name="is-digit"> </span>
 </pre></div>
 
 <div class="source-file-narrow"><em>lox/Scanner.java</em>, add after <em>peek</em>()</div>
@@ -949,7 +950,7 @@ add after <em>peek</em>()</div>
 <pre><span></span>  <span class="kd">private</span> <span class="kt">char</span> <span class="nf">peekNext</span><span class="o">()</span> <span class="o">{</span>                         
     <span class="k">if</span> <span class="o">(</span><span class="n">current</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">&gt;=</span> <span class="n">source</span><span class="o">.</span><span class="na">length</span><span class="o">())</span> <span class="k">return</span> <span class="sc">&#39;\0&#39;</span><span class="o">;</span>
     <span class="k">return</span> <span class="n">source</span><span class="o">.</span><span class="na">charAt</span><span class="o">(</span><span class="n">current</span> <span class="o">+</span> <span class="mi">1</span><span class="o">);</span>              
-  <span class="o">}</span> <span class="c1">// [peek-next]                                  </span>
+  <span class="o">}</span><span name="peek-next"> </span>
 </pre></div>
 
 <div class="source-file-narrow"><em>lox/Scanner.java</em>, add after <em>peek</em>()</div>
@@ -1250,10 +1251,10 @@ newlines should become meaningful while still nested inside brackets.</p>
     encounters a parse error. If it does, it goes back and tries turning the
     previous newline into a semicolon to get something grammatically valid.</p>
 <p>This design note would turn into a design diatribe if I went into complete
-detail about how that even <em>works</em>, much less all the various ways that that
-is a bad idea. It&rsquo;s a mess. JavaScript is the only language I know where
-many style guides demand explicit semicolons after every statement even
-though the language theoretically lets you elide them.</p>
+detail about how that even <em>works</em>, much less all the various ways that
+JavaScript&rsquo;s &ldquo;solution&rdquo; is a bad idea. It&rsquo;s a mess. JavaScript is the only
+language I know where many style guides demand explicit semicolons after
+every statement even though the language theoretically lets you elide them.</p>
 </li>
 </ul>
 <p>If you&rsquo;re designing a new language, you almost surely <em>should</em> avoid an explicit
@@ -1267,7 +1268,7 @@ don&rsquo;t do what JavaScript did.</p>
 <a href="representing-code.html" class="next">
   Next Chapter: &ldquo;Representing Code&rdquo; &rarr;
 </a>
-Hand-crafted by Robert Nystrom&ensp;&mdash;&ensp;<a href="https://github.com/munificent/craftinginterpreters/blob/master/LICENSE" target="_blank">&copy; 2015&hairsp;&ndash;&hairsp;2018</a>
+Hand-crafted by Robert Nystrom&ensp;&mdash;&ensp;<a href="https://github.com/munificent/craftinginterpreters/blob/master/LICENSE" target="_blank">&copy; 2015&hairsp;&ndash;&hairsp;2020</a>
 </footer>
 </article>
 

@@ -9,7 +9,7 @@
 > skin stands up, just like it did when we had fur. We are history! Everything
 > we've ever been on the way to becoming us, we still are.
 >
-> <cite>Terry Pratchett</cite>
+> <cite>Terry Pratchett, <em>A Hat Full of Sky</em></cite>
 
 Can you believe it? We've reached the last chapter of [Part II][]. We're almost
 done with our first Lox interpreter. The [previous chapter][] was a big ball of
@@ -138,21 +138,21 @@ doesn't usually do anything useful. However, Lox allows class declarations even
 inside blocks, so it's possible the superclass name refers to a local variable.
 In that case, we need to make sure it's resolved.
 
-<aside name="self">
-
-We resolve the superclass between declaring and defining the class name to
-handle this edge case:
+Because even well-intentioned programmers sometimes write weird code, there's a
+silly edge case we need to worry about while we're in here. Take a look at:
 
 ```lox
 class Oops < Oops {}
 ```
 
-If the class's name is declared but not defined when the superclass expression
-is evaluated, it becomes an error to mention it, like we want.
+There's no way this will do anything useful and if we let it go until the
+runtime, it will break the expectation the interpreter has about there not being
+cycles in the inheritance chain. The safest thing is to detect it statically and
+report it as an error:
 
-</aside>
+^code inherit-self (2 before, 1 after)
 
-Once that's done, we move to the interpreter:
+Assuming the code resolves without error, it travels to the interpreter:
 
 ^code interpret-superclass (1 before, 1 after)
 
@@ -702,6 +702,6 @@ refreshed and ready, we'll embark on our [next adventure][].
 
 [challenge]: the-lox-language.html#challenges
 [inner]: http://journal.stuffwithstuff.com/2012/12/19/the-impoliteness-of-overriding-methods/
-[beta]: http://cs.au.dk/~beta/
+[beta]: https://beta.cs.au.dk/
 
 </div>

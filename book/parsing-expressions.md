@@ -132,7 +132,7 @@ is by defining rules for precedence and associativity.
 
 *   **Associativity** determines which operator is evaluated first in a series
     of the *same* operator. When an operator is **left-associative** (think
-    "left-to-right"), operators on the left evaluate before ones of the right.
+    "left-to-right"), operators on the left evaluate before those on the right.
     Since `-` is left-associative, this expression:
 
         :::lox
@@ -233,7 +233,7 @@ name="paren">expression</span>, since the latter has lower precedence.
 <aside name="paren">
 
 Of course, it could be a *parenthesized* addition expression, but that's because
-the parentheses themeselves are treated as having the highest precedence.
+the parentheses themselves are treated as having the highest precedence.
 
 </aside>
 
@@ -369,7 +369,7 @@ and larger chunks of syntax.
 
 It's called "recursive *descent*" because it walks *down* the grammar.
 Confusingly, we also use direction metaphorically when talking about "high" and
-"low" precedence, but the orientation is reversed. In a top-down grammar, you
+"low" precedence, but the orientation is reversed. In a top-down parser, you
 reach the lowest-precedence expressions first because they may in turn contain
 subexpressions of higher precedence.
 
@@ -400,7 +400,7 @@ rule translates to code roughly like:
 </tbody>
 </table>
 
-It's called "*recursive* descent" because when a grammar rules refers to itself
+It's called "*recursive* descent" because when a grammar rule refers to itself
 -- directly or indirectly -- that translates to recursive method calls.
 
 ### The parser class
@@ -454,9 +454,9 @@ with the sequence of equality operators. We express that check using a handy
 
 ^code match
 
-It checks to see if the current token is any of the given types. If so, it
-consumes it and returns `true`. Otherwise, it returns `false` and leaves the
-token where it is.
+This checks to see if the current token is any of the given types. If so, it
+consumes the token and returns `true`. Otherwise, it returns `false` and leaves
+the token as the current one.
 
 The `match()` method is defined in terms of two more fundamental operations:
 
@@ -549,8 +549,8 @@ The code for this is a little different:
 
 Again, we look at the <span name="current">current<span> token to see how to
 parse. If it's a `!` or `-`, we must have a unary expression. In that case, we
-grab the token, and then recursively call `unary()` again to the parse the
-operand. Wrap that all up in a unary expression syntax tree and we're done.
+grab the token, and then recursively call `unary()` again to parse the operand.
+Wrap that all up in a unary expression syntax tree and we're done.
 
 <aside name="current">
 
@@ -627,11 +627,12 @@ error:
 Those are the table stakes if you want to get in the parser game at all, but you
 really want to raise the ante beyond that. A decent parser should:
 
-*   **Be fast.** Computers are thousands of times faster than when parser
-    technology was first invented. The days of needing to optimize your parser
-    so that it could get through an entire source file during a coffee break are
-    over. But programmer expectations have risen as quickly, if not faster. They
-    expect their editors to reparse files in milliseconds after every keystroke.
+*   **Be fast.** Computers are thousands of times faster than they were when
+    parser technology was first invented. The days of needing to optimize your
+    parser so that it could get through an entire source file during a coffee
+    break are over. But programmer expectations have risen as quickly, if not
+    faster. They expect their editors to reparse files in milliseconds after
+    every keystroke.
 
 *   **Report as many distinct errors as there are.** Aborting after the first
     error is easy to implement, but it's annoying for users if every time they
@@ -740,8 +741,8 @@ augment the grammar with a rule that matches the erroneous syntax. The parser
 safely parses it but then reports it as an error instead of producing a syntax
 tree.
 
-For example, some languages have an unary `+` operator, like `+123`, but Lox
-does not. Instead of getting confused when the parser stumbles onto a `+` at the
+For example, some languages have a unary `+` operator, like `+123`, but Lox does
+not. Instead of getting confused when the parser stumbles onto a `+` at the
 beginning of an expression, we could extend the unary rule to allow it:
 
 ```lox
@@ -768,7 +769,7 @@ parser's own state?
 
 With recursive descent, the parser's state -- which rules it is in the middle of
 recognizing -- is not stored explicitly in fields. Instead, we use Java's
-own callstack to track what the parser is doing. Each rule in the process of
+own call stack to track what the parser is doing. Each rule in the process of
 being parsed is a callframe on the stack. In order to reset that state, we need
 to clear out those callframes.
 

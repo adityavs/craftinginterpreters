@@ -3,7 +3,7 @@
 
 > To dwellers in a wood, almost every species of tree has its voice as well as
 > its feature.
-> <cite>Thomas Hardy</cite>
+> <cite>Thomas Hardy, <em>Under the Greenwood Tree</em></cite>
 
 In the [last chapter][scanning], we took the raw source code as a string and
 transformed it into a slightly higher-level representation: a series of tokens.
@@ -36,9 +36,13 @@ you manually evaluate an arithmetic expression like this:
 1 + 2 * 3 - 4
 ```
 
-Because you understand the rules of precedence -- the old "Please Excuse My Dear
-Aunt Sally" stuff -- you know that the `*` is evaluated before the `+` or `-`.
-One way to visualize that precedence is using a tree. Leaf nodes are numbers, and interior nodes are operators with branches for each of their operands.
+Because you understand the order of operations -- the old "[Please Excuse My
+Dear Aunt Sally][sally]" stuff -- you know that the `*` is evaluated before the
+`+` or `-`. One way to visualize that precedence is using a tree. Leaf nodes are
+numbers, and interior nodes are operators with branches for each of their
+operands.
+
+[sally]: https://en.wikipedia.org/wiki/Order_of_operations#Mnemonics
 
 In order to evaluate an arithmetic node, you need to know the numeric values of
 its subtrees, so you have to evaluate those first. That means working your way
@@ -224,22 +228,24 @@ book. Sorry.
 </aside>
 
 ```lox
-breakfast → protein "with" bread ;
-breakfast → protein ;
-breakfast → bread ;
+breakfast  → protein "with" breakfast "on the side" ;
+breakfast  → protein ;
+breakfast  → bread ;
 
-protein   → protein "and" protein ;
-protein   → "bacon" ;
-protein   → "sausage" ;
-protein   → cooked "eggs" ;
+protein    → crispiness "crispy" "bacon" ;
+protein    → "sausage" ;
+protein    → cooked "eggs" ;
 
-cooked    → "scrambled" ;
-cooked    → "poached" ;
-cooked    → "fried" ;
+crispiness → "really" ;
+crispiness → "really" crispiness ;
 
-bread     → "toast" ;
-bread     → "biscuits" ;
-bread     → "English muffin" ;
+cooked     → "scrambled" ;
+cooked     → "poached" ;
+cooked     → "fried" ;
+
+bread      → "toast" ;
+bread      → "biscuits" ;
+bread      → "English muffin" ;
 ```
 
 We can use that grammar to generate random breakfasts. Let's play a round and
@@ -248,42 +254,52 @@ the grammar, here `breakfast`. There are three productions for that, and we
 randomly pick the first one. Our resulting string looks like:
 
 ```text
-protein "with" bread
+protein "with" breakfast "on the side"
 ```
 
 We need to expand that first nonterminal, `protein`, so we pick a production for
 that. Let's pick:
 
 ```lox
-protein → protein "and" protein ;
-```
-
-Note that the production refers to its own rule. This is the key difference
-between context-free and regular languages. The former are allowed to recurse.
-It is exactly this that lets them nest and compose.
-
-We could keep picking the first production for `protein` over and over again
-yielding all manner of breakfasts like "bacon and sausage and sausage and bacon
-and...". We won't though. We need to again pick a production for `protein` in
-the inner reference to `protein "and" protein`. This time we'll pick `"bacon"`.
-We finally hit a terminal, so we set that as the first word in the resulting
-string.
-
-Now we pop back out to the first `protein "and" protein`. The next symbol is
-`"and"`, a terminal, so we add that. Then we hit another `protein`. This
-time, we pick:
-
-```lox
 protein → cooked "eggs" ;
 ```
 
-We need a production for `cooked` and pick `"poached"`. That's a terminal, so
-we add that. Now we're back to the `protein`, so we add `"eggs"`. We bounce back
-to `breakfast` and add `"with"`. Now all that's left is to pick a production for
-`bread`. We'll pick `"English muffin"`. That's again a terminal, so we add
-that and we're done:
+Next, we need a production for `cooked`, and so we pick `"poached"`. That's a
+terminal, so we add that. Now our string looks like:
+
+```text
+"poached" "eggs" "with" breakfast "on the side"
+```
+
+The next non-terminal is `breakfast` again. The first `breakfast` production we
+chose recursively refers back to the `breakfast` rule. Recursion like this
+usually indicates that the language is context-free instead of regular. In
+particular, this kind of nested recursion where the recursive nonterminal has
+productions on <span name="nest">both</span> sides of it means that it's not
+regular.
+
+<aside name="nest">
+
+Imagine that we've recursively expanded the `breakfast` rule here several times,
+like "bacon with bacon with bacon with bacon ...". In order to complete the
+string, we'll need to add an equivalent number of "on the side" bits to the end.
+Keeping track of that number of trailing parts is beyond the capabilities of a
+simple regular grammar. A regular grammar can *repeat*, but it can't *count*.
+
+</aside>
+
+We could keep picking the first production for `breakfast` over and over again
+yielding all manner of breakfasts like "bacon with sausage with scrambled eggs
+with bacon ...". We won't though. This time we'll pick `bread`. There are three
+rules for that, each of which contains only a terminal. We'll pick "English
+muffin".
+
+With that, every nonterminal in the string has been expanded until it finally
+contains only terminals and we're left with:
 
 <img src="image/representing-code/breakfast.png" alt='"Playing" the grammar to generate a string.' />
+
+Throw in some ham and Hollandaise, and you've got eggs Benedict.
 
 Any time we hit a rule that had multiple productions, we just picked one
 arbitrarily. It is this flexibility that allows a short number of grammar rules
@@ -294,7 +310,7 @@ pack an infinite number of strings into a finite grammar.
 ### Enhancing our notation
 
 Stuffing an infinite set of strings in a handful of rules is pretty fantastic,
-but let's take it farther. Our notation works, but it's a little tedious. So,
+but let's take it further. Our notation works, but it's a little tedious. So,
 like any good language designer, we'll sprinkle some syntactic sugar on top. In
 addition to terminals and nonterminals, we'll allow a few other kinds of
 expressions in the body of a rule:
@@ -318,7 +334,7 @@ expressions in the body of a rule:
     may be repeated zero or more times.
 
         :::lox
-        protein → protein ( "and" protein )* ;
+        crispiness → "really" "really"* ;
 
 <aside name="purity">
 
@@ -331,19 +347,22 @@ recursion.
 *   A postfix `+` is similar, but requires the preceding production to appear
     at least once.
 
+        :::lox
+        crispiness → "really"+ ;
+
 *   A postfix `?` is for an optional production. The thing before it can appear
     zero or one time, but not more.
 
         :::lox
-        breakfast → protein ( "with" bread )? ;
+        breakfast → protein ( "with" breakfast "on the side" )? ;
 
 With all of that sugar, our breakfast grammar condenses down to:
 
 ```lox
-breakfast → protein ( "and" protein )* ( "with" bread )?
+breakfast → protein ( "with" breakfast "on the side" )?
           | bread ;
 
-protein   → "bacon"
+protein   → "really"+ "crispy" "bacon"
           | "sausage"
           | ( "scrambled" | "poached" | "fried" ) "eggs" ;
 
@@ -451,14 +470,14 @@ Our scanner used a single Token class to represent all kinds of lexemes. To
 distinguish the different kinds -- think the number `123` versus the string
 `"123"` -- we included a simple TokenType enum.
 
-Syntax trees are not so <span name="token-data">homogenous</span>. Unary
+Syntax trees are not so <span name="token-data">homogeneous</span>. Unary
 expressions have a single operand, binary expressions have two, and literals
 have none. We *could* mush that all together into a single Expression class with
 an arbitrary list of children. Some compilers do.
 
 <aside name="token-data">
 
-Tokens aren't entirely homogenous either. Tokens for literals store the value
+Tokens aren't entirely homogeneous either. Tokens for literals store the value
 but other kinds of lexemes don't need that state. I have seen scanners that use
 different classes for literals and other kinds of lexemes, but I figured I'd
 keep things simpler.
@@ -645,9 +664,10 @@ if (expr instanceof Expr.Binary) {
 } else // ...
 ```
 
-That's verbose and slow. Also, the Java compiler won't tell us when we forget to
-add support for some new expression class. With an enum, we get a compile
-error when a switch is missing a case.
+But all of those sequential type tests are slow. Expression types whose names
+are alphabetically later would take longer to execute because they'd fall
+through more if cases before finding the right type. That's not my idea of an
+elegant solution.
 
 We have a family of classes and we need to associate a chunk of behavior with
 each one. The natural solution in an object-oriented language like Java is to
@@ -736,9 +756,9 @@ of code together into *functions*.
 
 A bunch of smart language nerds noticed that neither style made it easy to add
 *both* rows and columns to the <span name="multi">table</span>. They called this
-the "expression problem" because -- like we are here -- the example problem they
-used was about expression types in an interpreter, but also because it relates
-to how "expressive" a language is.
+difficulty the "expression problem" because -- like we are now -- they first ran
+into it when they were trying to figure out the best way to model expression
+syntax tree nodes in a compiler.
 
 <aside name="multi">
 
@@ -855,8 +875,8 @@ OK, let's weave it into our expression classes. We'll also <span
 name="context">refine</span> the pattern a little. In the pastry example, the
 visit and `accept()` methods don't return anything. In practice, visitors often
 want to define operations that produce values. But what return type should
-`accept()` have? We can't assume every visitor wants to produce the same type,
-so we'll use generics to let each one pick.
+`accept()` have? We can't assume every visitor class wants to produce the same
+type, so we'll use generics to let each implementation fill in a return type.
 
 <aside name="context">
 
@@ -982,6 +1002,7 @@ when we start parsing Lox code into syntax trees.
 1.  Earlier, I said that the `|`, `*`, and `+` forms we added to our grammar
     metasyntax were just syntactic sugar. Given this grammar:
 
+        :::lox
         expr → expr ( "(" ( expr ( "," expr )* )? ")" | "." IDENTIFIER )*
              | IDENTIFIER
              | NUMBER

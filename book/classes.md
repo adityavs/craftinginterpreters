@@ -48,11 +48,11 @@ approach.
 
 <aside name="multimethods">
 
-Multimethods are the one you're least likely to be familiar with. I'd love to
-talk more about them -- I designed [a hobby language][magpie] around them once
-and they are *super rad* -- but there are only so many pages I can fit in. If
-you'd like to learn more, take a look at [CLOS][] (the object system in Common
-Lisp), [Dylan][], [Julia][], or [Perl 6][].
+Multimethods are the approach you're least likely to be familiar with. I'd love
+to talk more about them -- I designed [a hobby language][magpie] around them
+once and they are *super rad* -- but there are only so many pages I can fit in.
+If you'd like to learn more, take a look at [CLOS][] (the object system in
+Common Lisp), [Dylan][], [Julia][], or [Perl 6][].
 
 [clos]: https://en.wikipedia.org/wiki/Common_Lisp_Object_System
 [magpie]: http://magpie-lang.org/
@@ -188,7 +188,7 @@ closing brace at the end, but it ensures the parser doesn't get stuck in an
 infinite loop if the user has a syntax error and forgets to correctly end the
 class body.
 
-We wrap the name and list of methods up in a Stmt.Class node and we're done.
+We wrap the name and list of methods into a Stmt.Class node and we're done.
 Usually, this would feed into the interpreter, but now we need to plumb it
 through the resolver first:
 
@@ -750,9 +750,9 @@ important semantic point.
 
 ^code lox-class-find-method
 
-You can probably guess this method is going to get more interesting later. We
-pass in the instance, but we aren't using it yet. For now, a simple map lookup
-on the class's method table is enough to get us started. Give it a try:
+You can probably guess this method is going to get more interesting later. For
+now, a simple map lookup on the class's method table is enough to get us
+started. Give it a try:
 
 <span name="crunch"></span>
 
@@ -860,9 +860,9 @@ we create an environment for the method body as usual:
 
 <img src="image/classes/call.png" alt="Calling the bound method and creating a new environment for the method body." />
 
-The parent of the body environment is the enviroment we created earlier to bind
-`this` to the current object. Thus any accesses of `this` inside the body
-successfully resolve to that instance.
+The parent of the body environment is the environment we created earlier to bind
+`this` to the current object. Thus any use of `this` inside the body
+successfully resolves to that instance.
 
 Reusing our environment code for implementing `this` also takes care of
 interesting cases where methods and functions interact, like:
@@ -929,11 +929,11 @@ the block for the method body.
 The resolver has a new *scope* for `this`, so the interpreter needs to create a
 corresponding environment for it. Remember, we always have to keep the
 resolver's scope chains and the interpreter's linked environments in sync with
-each other. At runtime, we create the environment when the method is looked up
-on the instance. We replace the previous line of code that simply returned the
+each other. At runtime, we create the environment after we find the method on
+the instance. We replace the previous line of code that simply returned the
 method's LoxFunction with this:
 
-^code lox-class-find-method-bind (1 before, 1 after)
+^code lox-instance-bind-method (1 before, 1 after)
 
 Note the new call to `bind()`. That looks like so:
 
@@ -994,7 +994,7 @@ traversing the syntax tree. It starts out `NONE` which means we aren't in one.
 
 When we begin to resolve a class declaration, we change that:
 
-^code set-current-class (1 before, 2 after)
+^code set-current-class (1 before, 1 after)
 
 As with `currentFunction`, we store the previous value of the field in a local
 variable. This lets us piggyback onto the JVM to keep a stack of `currentClass`
@@ -1062,7 +1062,7 @@ creates a new LoxInstance object.
 We'll do the remaining part -- user-defined initialization -- now. Languages
 have a variety of notations for the chunk of code that sets up a new object for
 a class. C++, Java, and C# use a method whose name matches the class name. Ruby
-and Python call it `init()`. That's nice and short, so we'll do that.
+and Python call it `init()`. The latter is nice and short, so we'll do that.
 
 In LoxClass's implementation of LoxCallable, we add a few more lines:
 
@@ -1083,7 +1083,7 @@ initializer, the arity is still zero.
 
 That's basically it. Since we bind the `init()` method before we call it, it has
 access to `this` inside its body. That, along with the arguments passed to the
-class, are all you need to be able to set up the new instance however you
+class, is all you need to be able to set up the new instance however you
 desire.
 
 ### Invoking init() directly
@@ -1307,6 +1307,7 @@ them better? We language nerds have a tendency to fetishize minimalism.
 Personally, I think simplicity is only part of the equation. What we really want
 to give the user is *power*, which I define as:
 
+    :::text
     power = breadth × ease ÷ complexity
 
 None of these are precise numeric measures. I'm using math as analogy here, not
@@ -1329,7 +1330,7 @@ actual quantification.
     tools, ecosystem, etc.). People talk about how many pages are in a
     language's spec, or how many keywords it has. It's how much the user has to
     load into their wetware before they can be productive in the system. It is
-    the antonym to simplicity.
+    the antonym of simplicity.
 
 Reducing complexity *does* increase power. The smaller the denominator, the
 larger the resulting value, so our intuition that simplicity is good is valid.

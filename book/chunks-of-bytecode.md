@@ -156,8 +156,9 @@ indirection out of the way. Right down to the metal. Machine code. It even
 *sounds* fast. *"Machine code."*
 
 Compiling directly to the native instruction set the chip supports is what the
-fastest languages do, and has been since the early days when engineers actually
-<span name="hand">hand-wrote</span> programs in machine code.
+fastest languages do. Targeting native code has been the most efficient option
+since way back in the early days when engineers actually <span
+name="hand">hand-wrote</span> programs in machine code.
 
 <aside name="hand">
 
@@ -326,12 +327,12 @@ arrays provide:
 * Constant-time indexed element lookup.
 * Constant-time appending to the end of the array.
 
-Those features are exactly why we used it all the time in jlox under the guise
-of Java's ArrayList class. Now that we're in C, we get to roll our own. If
-you're rusty on dynamic arrays, the idea is pretty simple. In addition to the
-array itself, we keep two numbers -- the number of elements in the array we have
-allocated ("capacity") and how many of those allocated entries are actually in
-use ("count").
+Those features are exactly why we used dynamic arrays all the time in jlox under
+the guise of Java's ArrayList class. Now that we're in C, we get to roll our
+own. If you're rusty on dynamic arrays, the idea is pretty simple. In addition
+to the array itself, we keep two numbers: the number of elements in the array we
+have allocated ("capacity") and how many of those allocated entries are actually
+in use ("count").
 
 ^code count-and-capacity (1 before, 2 after)
 
@@ -358,14 +359,14 @@ before storing an element." class="wide" />
 <aside name="amortized">
 
 Copying the existing elements when you grow the array makes it seem like
-appending an element is `O(n)`, not `O(1)` like I said above. However, you only
+appending an element is *O(n)*, not *O(1)* like I said above. However, you only
 need to do this copy step on *some* of the appends. Most of the time, there is
 already extra capacity, so you don't need to copy.
 
 To understand how this works, we need [**amortized
 analysis**](https://en.wikipedia.org/wiki/Amortized_analysis). That shows us
 that as long as we grow the array by a multiple of its current size, when we
-average out the cost of a *sequence* of appends, each append is `O(1)`.
+average out the cost of a *sequence* of appends, each append is *O(1)*.
 
 </aside>
 
@@ -594,12 +595,12 @@ Here's a start at the implementation file:
 To disassemble a chunk, we print a little header (so we can tell *which* chunk
 we're looking at) and then crank through the bytecode, disassembling each
 instruction. The way we iterate through the code is a little odd. Instead of
-incrementing `i` in the loop, we let `disassembleInstruction()` do it for us.
-When we call that function, after disassembling the instruction at the given
+incrementing `offset` in the loop, we let `disassembleInstruction()` do it for
+us. When we call that function, after disassembling the instruction at the given
 offset, it returns the offset of the *next* instruction. This is because, as
 we'll see later, instructions can have different sizes.
 
-The core of the debug module is this function:
+The core of the "debug" module is this function:
 
 ^code disassemble-instruction
 
@@ -609,7 +610,7 @@ doing control flow and jumping around in the bytecode.
 
 Next, it reads a single byte from the bytecode at the given offset. That's our
 opcode. We <span name="switch">switch</span> on that. For each kind of
-instruction, we dispatch to a little utlity function for displaying it. On the
+instruction, we dispatch to a little utility function for displaying it. On the
 off chance that the given byte doesn't look like an instruction at all -- a bug
 in our compiler -- we print that too. For the one instruction we do have,
 `OP_RETURN`, the display function is:
@@ -629,7 +630,7 @@ instructions will have more going on.
 
 If we run our nascent interpreter now, it actually prints something:
 
-```
+```text
 == test chunk ==
 0000 OP_RETURN
 ```
@@ -757,11 +758,7 @@ Don't forget the include:
 
 ^code chunk-h-include-value (1 before, 2 after)
 
-And another include over in the "chunk.c" implementation file:
-
-^code chunk-c-include-value (1 before, 2 after)
-
-Ah, C, and it's Stone Age modularity story. Where were we? Right. When we
+Ah, C, and its Stone Age modularity story. Where were we? Right. When we
 initialize a new chunk, we initialize its constant list too:
 
 ^code chunk-init-constant-array (1 before, 1 after)
@@ -871,12 +868,12 @@ function to disassemble it:
 
 There's more going on here. As with `OP_RETURN`, we print out the name of the
 opcode. Then we pull out the constant index from the subsequent byte in the
-chunk. We print that index, but that isn't super useful to we human readers. So
+chunk. We print that index, but that isn't super useful to us human readers. So
 we also look up the actual constant value -- since constants *are* known at
 compile-time after all -- and display the value itself too.
 
 This requires some way to print a Lox Value. That function will live in the
-value module, so we include that:
+"value" module, so we include that:
 
 ^code debug-include-value (1 before, 2 after)
 
@@ -926,12 +923,11 @@ in the code array.
 <aside name="side">
 
 This braindead encoding does do one thing right: it keeps the line information
-in a *separate* array instead of interleaving it in the bytecode itself.
-
-Since line information is only used when a runtime error occurs, we don't want
-it next to the bytecode, taking up precious space in the CPU cache and causing
-more cache misses as the interpreter skips past it to get to the real
-instructions it cares about.
+in a *separate* array instead of interleaving it in the bytecode itself. Since
+line information is only used when a runtime error occurs, we don't want it
+between the instructions, taking up precious space in the CPU cache and causing
+more cache misses as the interpreter skips past it to get to the opcodes and
+operands it cares about.
 
 </aside>
 
@@ -993,7 +989,7 @@ visually clear, we show a `|` for any instruction that comes from the same
 source line as the preceding one. The resulting output for our hand-written
 chunk looks like:
 
-```
+```text
 == test chunk ==
 0000  123 OP_CONSTANT         0 '1.2'
 0002    | OP_RETURN

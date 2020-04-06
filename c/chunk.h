@@ -17,29 +17,35 @@ typedef enum {
   OP_TRUE,
   OP_FALSE,
 //< Types of Values literal-ops
-//> Global Variables not-yet
+//> Global Variables pop-op
   OP_POP,
-//< Global Variables not-yet
-//> Local Variables not-yet
+//< Global Variables pop-op
+//> Local Variables get-local-op
   OP_GET_LOCAL,
+//< Local Variables get-local-op
+//> Local Variables set-local-op
   OP_SET_LOCAL,
-//< Local Variables not-yet
-//> Global Variables not-yet
+//< Local Variables set-local-op
+//> Global Variables get-global-op
   OP_GET_GLOBAL,
+//< Global Variables get-global-op
+//> Global Variables define-global-op
   OP_DEFINE_GLOBAL,
+//< Global Variables define-global-op
+//> Global Variables set-global-op
   OP_SET_GLOBAL,
-//< Global Variables not-yet
-//> Closures not-yet
+//< Global Variables set-global-op
+//> Closures upvalue-ops
   OP_GET_UPVALUE,
   OP_SET_UPVALUE,
-//< Closures not-yet
-//> Classes and Instances not-yet
+//< Closures upvalue-ops
+//> Classes and Instances property-ops
   OP_GET_PROPERTY,
   OP_SET_PROPERTY,
-//< Classes and Instances not-yet
-//> Superclasses not-yet
+//< Classes and Instances property-ops
+//> Superclasses get-super-op
   OP_GET_SUPER,
-//< Superclasses not-yet
+//< Superclasses get-super-op
 //> Types of Values comparison-ops
   OP_EQUAL,
   OP_GREATER,
@@ -57,61 +63,43 @@ typedef enum {
 //> A Virtual Machine negate-op
   OP_NEGATE,
 //< A Virtual Machine negate-op
-//> Global Variables not-yet
+//> Global Variables op-print
   OP_PRINT,
-//< Global Variables not-yet
-//> Jumping Forward and Back not-yet
+//< Global Variables op-print
+//> Jumping Back and Forth jump-op
   OP_JUMP,
+//< Jumping Back and Forth jump-op
+//> Jumping Back and Forth jump-if-false-op
   OP_JUMP_IF_FALSE,
+//< Jumping Back and Forth jump-if-false-op
+//> Jumping Back and Forth loop-op
   OP_LOOP,
-//< Jumping Forward and Back not-yet
-//> Calls and Functions not-yet
-  OP_CALL_0,
-  OP_CALL_1,
-  OP_CALL_2,
-  OP_CALL_3,
-  OP_CALL_4,
-  OP_CALL_5,
-  OP_CALL_6,
-  OP_CALL_7,
-  OP_CALL_8,
-//< Calls and Functions not-yet
-//> Methods and Initializers not-yet
-  OP_INVOKE_0,
-  OP_INVOKE_1,
-  OP_INVOKE_2,
-  OP_INVOKE_3,
-  OP_INVOKE_4,
-  OP_INVOKE_5,
-  OP_INVOKE_6,
-  OP_INVOKE_7,
-  OP_INVOKE_8,
-//< Methods and Initializers not-yet
-//> Superclasses not-yet
-  OP_SUPER_0,
-  OP_SUPER_1,
-  OP_SUPER_2,
-  OP_SUPER_3,
-  OP_SUPER_4,
-  OP_SUPER_5,
-  OP_SUPER_6,
-  OP_SUPER_7,
-  OP_SUPER_8,
-//< Superclasses not-yet
-//> Closures not-yet
+//< Jumping Back and Forth loop-op
+//> Calls and Functions op-call
+  OP_CALL,
+//< Calls and Functions op-call
+//> Methods and Initializers invoke-op
+  OP_INVOKE,
+//< Methods and Initializers invoke-op
+//> Superclasses super-invoke-op
+  OP_SUPER_INVOKE,
+//< Superclasses super-invoke-op
+//> Closures closure-op
   OP_CLOSURE,
+//< Closures closure-op
+//> Closures close-upvalue-op
   OP_CLOSE_UPVALUE,
-//< Closures not-yet
+//< Closures close-upvalue-op
   OP_RETURN,
-//> Classes and Instances not-yet
+//> Classes and Instances class-op
   OP_CLASS,
-//< Classes and Instances not-yet
-//> Superclasses not-yet
-  OP_SUBCLASS,
-//< Superclasses not-yet
-//> Methods and Initializers not-yet
+//< Classes and Instances class-op
+//> Superclasses inherit-op
+  OP_INHERIT,
+//< Superclasses inherit-op
+//> Methods and Initializers method-op
   OP_METHOD
-//< Methods and Initializers not-yet
+//< Methods and Initializers method-op
 } OpCode;
 //< op-enum
 //> chunk-struct

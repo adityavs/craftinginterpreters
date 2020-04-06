@@ -10,9 +10,10 @@
 <link rel="stylesheet" type="text/css" href="style.css" />
 
 <!-- Oh, God, Source Code Pro is so beautiful it makes me want to cry. -->
-<link href='http://fonts.googleapis.com/css?family=Source+Code+Pro:400|Source+Sans+Pro:300,400,600' rel='stylesheet' type='text/css'>
+<link href='https://fonts.googleapis.com/css?family=Source+Code+Pro:400|Source+Sans+Pro:300,400,600' rel='stylesheet' type='text/css'>
+
 <link rel="icon" type="image/png" href="image/favicon.png" />
-<script src="jquery-1.10.1.min.js"></script>
+<script src="jquery-3.4.1.min.js"></script>
 <script src="script.js"></script>
 
 <!-- Google analytics -->
@@ -98,9 +99,9 @@
   <h1>Control Flow</h1>
 
 <div class="sign-up closable">
-    <h1>This book is a work in progress!</h1>
+  <h1>This book is a work in progress!</h1>
     <span class="dismiss">&times;</span>
-    <p>If you see a mistake, find something unclear, or have a suggestion, please <a href="https://github.com/munificent/craftinginterpreters/issues" target="_blank">let me know</a>. To learn when new chapters are up, join the mailing list:</p>
+    <p>If you see a mistake, find something unclear, or have a suggestion, please <a href="https://github.com/munificent/craftinginterpreters/issues" target="_blank">let me know</a>. To follow its progress, please join the mailing list:</p>
 
   <!-- Begin MailChimp Signup Form -->
   <div id="mc_embed_signup">
@@ -271,7 +272,7 @@ add after <em>statement</em>()</div>
 <pre><span></span>  <span class="kd">private</span> <span class="n">Stmt</span> <span class="nf">ifStatement</span><span class="o">()</span> <span class="o">{</span>                                         
     <span class="n">consume</span><span class="o">(</span><span class="n">LEFT_PAREN</span><span class="o">,</span> <span class="s">&quot;Expect &#39;(&#39; after &#39;if&#39;.&quot;</span><span class="o">);</span>                     
     <span class="n">Expr</span> <span class="n">condition</span> <span class="o">=</span> <span class="n">expression</span><span class="o">();</span>                                     
-    <span class="n">consume</span><span class="o">(</span><span class="n">RIGHT_PAREN</span><span class="o">,</span> <span class="s">&quot;Expect &#39;)&#39; after if condition.&quot;</span><span class="o">);</span> <span name="parens"></span>
+    <span class="n">consume</span><span class="o">(</span><span class="n">RIGHT_PAREN</span><span class="o">,</span> <span class="s">&quot;Expect &#39;)&#39; after if condition.&quot;</span><span class="o">);</span><span name="parens"> </span>
 
     <span class="n">Stmt</span> <span class="n">thenBranch</span> <span class="o">=</span> <span class="n">statement</span><span class="o">();</span>                                     
     <span class="n">Stmt</span> <span class="n">elseBranch</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>                                            
@@ -368,11 +369,11 @@ choice not to evaluate it becomes user-visible.</p>
 <p>Since we don&rsquo;t have the conditional operator, you might think we&rsquo;re done with
 branching, but no. Even without the ternary operator, there are two other
 operators that are technically control flow constructs<span class="em">&mdash;</span>the logical operators
-and (<code>&amp;&amp;</code>) and or (<code>||</code>).</p>
+<code>and</code> and <code>or</code>.</p>
 <p>These aren&rsquo;t like other binary operators because they <strong>short-circuit</strong>. If,
 after evaluating the left operand, we know what the result of the logical
 expression must be, we don&rsquo;t evaluate the right operand. For example:</p>
-<div class="codehilite"><pre><span></span><span class="nb">false</span> <span class="err">&amp;&amp;</span> <span class="n">sideEffect</span><span class="p">();</span>
+<div class="codehilite"><pre><span></span><span class="nb">false</span> <span class="k">and</span> <span class="n">sideEffect</span><span class="p">();</span>
 </pre></div>
 
 
@@ -382,9 +383,9 @@ isn&rsquo;t going to be the case, so there&rsquo;s no need to evaluate <code>sid
 it gets skipped.</p>
 <p>This is why we didn&rsquo;t implement the logical operators with the other binary
 operators. Now we&rsquo;re ready. The two new operators are low in the precedence
-table. As in C, they each have their <span name="logical">own</span> precedence
-with <code>||</code> lower than <code>&amp;&amp;</code>. We slot them right between <code>assignment</code> and
-<code>equality</code>:</p>
+table. Similar to <code>||</code> and <code>&amp;&amp;</code> in C, they each have their <span
+name="logical">own</span> precedence with <code>or</code> lower than <code>and</code>. We slot them
+right between <code>assignment</code> and <code>equality</code>:</p>
 <aside name="logical">
 <p>I&rsquo;ve always wondered why they don&rsquo;t have the same precedence like the various
 comparison or equality operators do.</p>
@@ -594,7 +595,7 @@ isn&rsquo;t complex, but it makes Lox much more powerful now. We can finally wri
 program whose running time isn&rsquo;t strictly bound by the length of the source
 code.</p>
 <h2><a href="#for-loops" name="for-loops"><small>9&#8202;.&#8202;5</small> For Loops</a></h2>
-<p>We&rsquo;re down to the last flow control construct, <span name="for">Ye Olde</span>
+<p>We&rsquo;re down to the last control flow construct, <span name="for">Ye Olde</span>
 C-style for loop. I probably don&rsquo;t need to remind you, but it looks like this:</p>
 <div class="codehilite"><pre><span></span><span class="k">for</span> <span class="p">(</span><span class="k">var</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">10</span><span class="p">;</span> <span class="n">i</span> <span class="o">=</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="k">print</span> <span class="n">i</span><span class="p">;</span>
 </pre></div>
@@ -623,7 +624,7 @@ being looped over supports.</p>
 <p>Those are great. For Lox, though, we&rsquo;re limited by building up the interpreter a
 chapter at a time. We don&rsquo;t have objects and methods yet, so we have no way of
 defining an iteration protocol that the for loop could use. So we&rsquo;ll stick with
-the old school C for loop. Think of it as &ldquo;vintage&rdquo;. The fixie of flow control
+the old school C for loop. Think of it as &ldquo;vintage&rdquo;. The fixie of control flow
 statements.</p>
 </aside>
 <p>Inside the parentheses, you have three clauses separated by semicolons:</p>
@@ -918,8 +919,9 @@ and the kind of syntactic extensibility of the previous category. They want the
 syntax to get out of the way of the semantics, so they focus on keeping both the
 grammar and libraries simple. Code should be obvious more than beautiful.</p>
 <p>Somewhere in the middle you have languages like Java, C# and Python. Eventually
-you reach Ruby, C++, Perl, and D, languages who have stuffed so much syntax into
-their grammar, they are running out of punctuation characters on the keyboard.</p>
+you reach Ruby, C++, Perl, and D, languages which have stuffed so much syntax
+into their grammar, they are running out of punctuation characters on the
+keyboard.</p>
 <p>To some degree, location on the spectrum correlates with age. It&rsquo;s relatively
 easy to add bits of syntactic sugar in later releases. New syntax is a crowd
 pleaser, and it&rsquo;s less likely to break existing programs than mucking with the
@@ -946,7 +948,7 @@ language<span class="em">&mdash;</span>relies on your own sense of taste.</p>
 <a href="functions.html" class="next">
   Next Chapter: &ldquo;Functions&rdquo; &rarr;
 </a>
-Hand-crafted by Robert Nystrom&ensp;&mdash;&ensp;<a href="https://github.com/munificent/craftinginterpreters/blob/master/LICENSE" target="_blank">&copy; 2015&hairsp;&ndash;&hairsp;2018</a>
+Hand-crafted by Robert Nystrom&ensp;&mdash;&ensp;<a href="https://github.com/munificent/craftinginterpreters/blob/master/LICENSE" target="_blank">&copy; 2015&hairsp;&ndash;&hairsp;2020</a>
 </footer>
 </article>
 

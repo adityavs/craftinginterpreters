@@ -3,7 +3,8 @@
 
 > In the middle of the journey of our life I found myself within a dark woods
 > where the straight way was lost.
-> <cite>Dante Alighieri</cite>
+>
+> <cite>Dante Alighieri, <em>Inferno</em></cite>
 
 This chapter is exciting for not one, not two, but *three* reasons. First, it
 provides the final segment of our VM's execution pipeline. Once in place, we can
@@ -165,7 +166,7 @@ and output the right bytecode.
 First up, the front half of the compiler. This function's name should sound
 familiar:
 
-^code advance
+^code advance (1 before)
 
 Just like in jlox, it steps forward through the token stream. It asks the
 scanner for the next token and stores it for later use. Before doing that, it
@@ -193,8 +194,8 @@ happens using this:
 
 ^code error-at-current
 
-It pulls the location out of the current token in order to tell the user where
-the error occurred and forwards to `errorAt()`. More often, we'll report an
+We pull the location out of the current token in order to tell the user where
+the error occurred and forward it to `errorAt()`. More often, we'll report an
 error at the location of the token we just consumed, so we give the shorter name
 to this other function:
 
@@ -218,7 +219,7 @@ we can make it do that:
 
 I've got another flag for error handling to introduce. We want to avoid error
 cascades. If the user has a mistake in their code and the parser gets confused
-about where it is in the grammer, we don't want it to spew out a whole pile of
+about where it is in the grammar, we don't want it to spew out a whole pile of
 meaningless knock-on errors after the first one.
 
 We fixed that in jlox using panic mode error recovery. In the Java interpreter,
@@ -265,9 +266,9 @@ There's one last parsing function, another old friend from jlox:
 
 ^code consume
 
-It's similar to `advance()` in that reads the next token. But it also validates
-that the token has an expected type. If not, it reports an error. This function
-is the foundation of most syntax errors in the compiler.
+It's similar to `advance()` in that it reads the next token. But it also
+validates that the token has an expected type. If not, it reports an error. This
+function is the foundation of most syntax errors in the compiler.
 
 OK, that's enough on the front end for now.
 
@@ -345,12 +346,12 @@ them.
 
 ### Parsers for tokens
 
-Imagine if every expression in Lox is only a single token. Each token type maps
-to a different kind of expression. We define a function for each that outputs
-the appropriate bytecode for that expression. Then we build an array of function
-pointers. The indexes in the array correspond to the `TokenType` enum values,
-and the function at that index is the code to compile an expression of that
-token type.
+Imagine that every expression in Lox is only a single token. Each token type
+maps to a different kind of expression. We define a function for each that
+outputs the appropriate bytecode for that expression. Then we build an array of
+function pointers. The indexes in the array correspond to the `TokenType` enum
+values, and the function at that index is the code to compile an expression of
+that token type.
 
 To add support for number literals, we store a pointer to the following function
 at the `TOKEN_NUMBER` index in the array:
@@ -397,11 +398,11 @@ number literals to bytecode.
 
 ### Parentheses for grouping
 
-Our array of parsing function pointers would be great if every expression was
-only a single token long. Alas, most are longer. However, many expressions
-*start* with a particular token. We call these *prefix* expressions. For
-example, when we're parsing an expression and the current token is `(`, we know
-we must be looking at a parenthesized grouping expression.
+Our as-yet-imaginary array of parsing function pointers would be great if every
+expression was only a single token long. Alas, most are longer. However, many
+expressions *start* with a particular token. We call these *prefix* expressions.
+For example, when we're parsing an expression and the current token is `(`, we
+know we must be looking at a parenthesized grouping expression.
 
 It turns out our function pointer array handles those too. The parsing function
 for an expression type can consume any additional tokens that it wants to, just
@@ -409,10 +410,9 @@ like in a regular recursive descent parser. Here's how parentheses work:
 
 ^code grouping
 
-Again, it assumes the initial `(` has already been consumed. It <span
-name="recursive">recursively</span> calls back into `expression()` to compile
-the expression between the parentheses, then it parses the closing `)` at the
-end.
+Again, we assume the initial `(` has already been consumed. We <span
+name="recursive">recursively</span> call back into `expression()` to compile the
+expression between the parentheses, then parse the closing `)` at the end.
 
 <aside name="recursive">
 
@@ -444,7 +444,7 @@ function to compile the `!` operator in [the next chapter][next].
 As in `grouping()`, we recursively call `expression()` to compile the operand.
 After that, we emit the bytecode to perform the negation. It might seem a little
 weird to write the negate instruction *after* its operand's bytecode since the
-`-` appears on the left, but think about in terms of order of execution:
+`-` appears on the left, but think about it in terms of order of execution:
 
 1. We evaluate the operand first which leaves its value on the stack.
 
@@ -476,9 +476,10 @@ that into `emitByte()`, but I wanted to keep things simple for the book.
 
 </aside>
 
-There is one problem with this code, though. By calling `expression()`, we allow
-any expression for the operand, regardless of precedence. Once we add binary
-operators and other syntax, that will do the wrong thing. Consider:
+There is one problem with this code, though. The `expression()` function it
+calls will parse any expression for the operand, regardless of precedence. Once
+we add binary operators and other syntax, that will do the wrong thing.
+Consider:
 
 ```lox
 -a.b + c;
@@ -486,46 +487,62 @@ operators and other syntax, that will do the wrong thing. Consider:
 
 Here, the operand to `-` should be just the `a.b` expression, not the entire
 `a.b + c`. But if `unary()` calls `expression()`, the latter will happily chew
-through all of the remaining code including the `+`.
+through all of the remaining code including the `+`. It will erronously treat
+the `-` as lower precendence than the `+`.
 
-The operand to `-` is an expression, but it needs to only allow expressions at a
-certain precedence level or higher. In jlox's recursive descent parser, each
-method for parsing a specific expression also parsed any expressions of higher
-precedence too. By calling the parsing method for the expression type of the
-lowest allowed precedence, we'd roll in the others as well.
+When parsing the operand to unary `-`, we need to compile only expressions at a
+certain precedence level or higher. In jlox's recursive descent parser we could
+accomplish that by calling into the parsing method for the lowest precendence
+expression we wanted to allow (in this case, `call()`). Each method for parsing
+a specific expression also parsed any expressions of higher precedence too, so
+that would include the rest of the precedence table.
 
-The parsing functions here are different. Each only parses exactly one type of
-expression. They don't cascade to include higher precedence expression types
-too. We need a different solution. For now, let's assume that we have a
-function that parses any expression of a given precedence level or higher:
+The parsing functions like `number()` and `unary()` here are different. Each
+only parses exactly one type of expression. They don't cascade to include higher
+precedence expression types too. We need a different solution, and it looks like
+this:
 
 ^code parse-precedence
 
-We will circle back and see *how* that function does what it does. Right now,
-it's magic. In order to take the "precedence" as a parameter, we define it
-numerically:
+This function, once we implement it, starts at the current token and parses any
+expression at the given precence level or higher. We have some other setup to
+get through before we can write the body of this function, but you can probably
+guess that it will use that table of parsing function pointers I've been talking
+about. For now, don't worry too much about how it works. In order to take the
+"precedence" as a parameter, we define it numerically:
 
 ^code precedence (1 before, 2 after)
 
 These are all of Lox's precedence levels in order from lowest to highest. Since
 C implicitly gives successively larger numbers for enums, this means that
-`PREC_CALL` is numerically larger than `PREC_UNARY`. With this function in hand,
-it's a snap to fill in the missing body for `expression()`:
+`PREC_CALL` is numerically larger than `PREC_UNARY`. For example, say the
+compiler is sitting on a chunk of code like:
+
+```lox
+-a.b + c
+```
+
+If we call `parsePrecedence(PREC_ASSIGNMENT)`, then it will parse the entire
+expression because `+` has higher precedence than assignment. If instead we
+call `parsePrecedence(PREC_UNARY)`, it will compile the `-a.b` and stop there.
+It doesn't keep going through the `+` because the addition is lower precedence
+than unary operators.
+
+With this function in hand, it's a snap to fill in the missing body for
+`expression()`:
 
 ^code expression-body (1 before, 1 after)
 
-It simply parses the lowest precedence level, which subsumes all of the higher
-precedence expressions too.
-
-Now, to compile the operand for a unary expression, we call this new function
-and limit it to the appropriate level:
+We simply parse the lowest precedence level, which subsumes all of the higher
+precedence expressions too. Now, to compile the operand for a unary expression,
+we call this new function and limit it to the appropriate level:
 
 ^code unary-operand (1 before, 2 after)
 
 We use the unary operator's own `PREC_UNARY` precedence to permit <span
 name="useful">nested</span> unary expressions like `!!doubleNegative`. Since
 unary operators have pretty high precedence, that correctly excludes things like
-binary operators. When we call `unary()` to parse:
+binary operators. Speaking of which...
 
 <aside name="useful">
 
@@ -534,53 +551,51 @@ languages let you do it, so we do too.
 
 </aside>
 
-```lox
--a.b + c;
-```
-
-It consumes the `a.b` and then stops there. Then `unary()` returns and relies on
-some other code to handle parsing the surrounding `+` expression that contains
-the negation on its left. Which brings us to...
-
 ## Parsing Infix Expressions
 
-We're down to the binary operators. These are different from the previous
-expressions because they are *infix*. With the other expressions, we know what
-we are parsing from its very first token. With infix expressions, we don't even
-know we're in the middle of a binary operator until *after* we've parsed its
-left operand and then stumbled onto the operator token in the middle.
+Binary operators are different from the previous expressions because they are
+*infix*. With the other expressions, we know what we are parsing from the very
+first token. With infix expressions, we don't know we're in the middle of a
+binary operator until *after* we've parsed its left operand and then stumbled
+onto the operator token in the middle.
 
 Here's an example:
 
 ```lox
--1 + 3
+1 + 2
 ```
 
-Let's walk through trying to compile it with what we have so far:
+Let's walk through trying to compile it with what we know so far:
 
-1.  We call `expression()`. It sees the first token is `-`. The associated parse
-    function is `unary()`, so it calls that.
+1.  We call `expression()`. That in turn calls
+    `parsePrecedence(PREC_ASSIGNMENT)`.
 
-3.  `unary()` calls `parsePrecedence()` to parse the operand. That compiles the
-    `1` literal. It does not compile the `+`, because that's too low precedence
-    for the call to `parsePrecedence()`.
+2.  That function (once we implement it) sees the leading number token and
+    recognizes it is parsing a number literal. It hands off control to
+    `number()`.
 
-4.  `unary()` returns back to `expression()`.
+3.  `number()` creates a constant, emits an `OP_CONSTANT`, and returns back to
+    `parsePrecedence()`.
 
-Now what? It turns out we are right where we need to be. Now that we've compiled
-the prefix expression, the next token is `+`. That's the token we need to detect
-that we're in the middle of an infix expression and to realize that the prefix
+Now what? The call to `parsePrecedence()` should consume the entire addition
+expression, so it needs to keep going somehow. Fortunately, the parser is right
+where we need it to be. Now that we've compiled the leading number expression,
+the next token is `+`. That's the exact token that `parsePrecedence()` needs to
+detect that we're in the middle of an infix expression and to realize that the
 expression we already compiled is actually an operand to that.
 
-So we turn that array of function pointers into a *table*. One column associates
-*prefix* parser functions with token types. The new column associates *infix*
-parser functions with token types. In the rows for `TOKEN_PLUS`, `TOKEN_MINUS`,
-`TOKEN_STAR`, and `TOKEN_SLASH`, we point to this function:
+So this hypothetical array of function pointers doesn't just list functions to
+parse expressions that start with a given token. Instead, it's a *table* of
+function pointers. One column associates prefix parser functions with token
+types. The second column associates infix parser functions with token types.
+
+The function we will use as the infix parser for `TOKEN_PLUS`, `TOKEN_MINUS`,
+`TOKEN_STAR`, and `TOKEN_SLASH` is this:
 
 ^code binary
 
 When a prefix parser function is called, the leading token has already been
-consumed. An infix parser function is even more *in media res* -- the left-hand
+consumed. An infix parser function is even more *in medias res* -- the left-hand
 operand has already been compiled and the subsequent infix operator consumed.
 
 The fact that the left operand gets compiled first works out fine. It means at
@@ -770,7 +785,7 @@ That's the whole thing. Really. Here's how the entire function works: At the
 beginning of `parsePrecedence()`, we look up a prefix parser for the current
 token. The first token is *always* going to belong to some kind of prefix
 expression, by definition. It may turn out to be nested as an operand inside one
-or more infix expressions, but as you read the code from the left to right, the
+or more infix expressions, but as you read the code from left to right, the
 first thing you hit is always some prefix expression.
 
 After parsing that, which may consume more tokens, the prefix expression is
@@ -827,7 +842,7 @@ Since this isn't for end users, we hide it behind a flag:
 
 ^code define-debug-print-code (2 before, 1 after)
 
-When that flag is defined, we use our existing debug module to print out the
+When that flag is defined, we use our existing "debug" module to print out the
 chunk's bytecode:
 
 ^code dump-chunk (1 before, 1 after)
